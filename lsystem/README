@@ -1,0 +1,27 @@
+CS2 Project UCF
+Skyler Goodell
+Danny Wasserman
+TJ Horwath
+
+Currently: 
+
+Project Status- Complete
+
+UPDATE: (Skyler 12/5/11 7:09pm)
+All necessary features for the project have been completed. Congratulations!
+
+UPDATE: (Skyler 11/28/11 6:36pm)
+I added a parameter to the ILSystemParams interface, so it's a pretty big change. Now the main class will automatically pass a reference to the Parameters Class to each engine class. I found this was necessary (or at least very useful) for simulating the current position of the plant so that it will grow towards sunlight. Let me know if this causes any issues.
+
+UPDATE: (TJ 11/26/2011 12:35pm)
+Hey guys, I've been working on two engines, a standard tree and a Sierpinski's triangle. The triangle one works really well, the tree is a bit standard, I didn't add in any probabilities with it. That's probably what I'm going to work on next, making the tree a bit more random in it's growth. Then I'll probably work on a few more engines, like a Christmas tree or other objects.
+
+UPDATE: (Skyler 11/24/2011 4:10pm)
+This is a big update guys, sorry if it causes any confusion.
+
+I added a little interface to unify all our projects. When you run the project now you will get a little pop-up window that will allow you to select a domain (you java class), a params file and the number of steps to run. This window uses reflection to automatically see if there are any classes in the src/lsystem/engine folder. So just put your .java files there and be sure to use my batch files to compile and run so it puts the executables in the right place.
+
+Let me know if anything breaks on you.
+
+UPDATE: (Skyler 11/21/2011 6:16pm)
+So that you do not have to use eclipse for everything I added a 'compile.bat' and a 'run.bat' to do those actions for you. You can just use gedit or notepad++ to edit files from the git directory if you want.

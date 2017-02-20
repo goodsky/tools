@@ -1,0 +1,1 @@
+java -classpath bin lsystem/Main

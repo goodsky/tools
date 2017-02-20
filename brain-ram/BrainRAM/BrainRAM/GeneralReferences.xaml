@@ -1,0 +1,47 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="BrainRAM.GeneralReferences"
+    xmlns:local="clr-namespace:BrainRAM"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock Text="ADDITIONAL BRAIN RAM" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="References" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+        </StackPanel>
+
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            
+            <ScrollViewer Name="MainScroll" HorizontalAlignment="Left" Height="482" VerticalAlignment="Top" Width="456">
+                <StackPanel>
+                    <Button Content="ASCII" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ASCII_Tap" BorderThickness="0" />
+                    <Button Content="American Sign Language" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ASL_Tap" BorderThickness="0" />
+                    <Button Content="Braille" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Braille_Tap" BorderThickness="0" />
+                    <Button Content="Maritime Flags" FontSize="36"  HorizontalAlignment="Left" VerticalAlignment="Top" Click="Maritime_Tap" BorderThickness="0" />
+                    <Button Content="Morse Code" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Morse_Tap" BorderThickness="0" />
+                    <Button Content="Pig Pen Cipher" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PigPen_Tap" BorderThickness="0" />
+                    <Button Content="Rainbow Colors" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Rainbow_Tap" BorderThickness="0" />
+                    <Button Content="Resistor Color Codes" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Resistor_Tap" BorderThickness="0" />
+                    <Button Content="Roman Numerals" FontSize="36" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Roman_Tap" BorderThickness="0" />
+                </StackPanel>
+            </ScrollViewer>
+            <local:Scratchpad Name="LocalScratchpad" />
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>

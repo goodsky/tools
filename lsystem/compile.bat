@@ -1,0 +1,1 @@
+javac src/lsystem/*.java src/lsystem/visual/*.java src/lsystem/engine/*.java -d bin/.
