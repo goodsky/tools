@@ -5,6 +5,7 @@
 import requests
 from bs4 import BeautifulSoup
 from player import Player
+from team import Team
 
 
 class ScraperException(ValueError):
@@ -17,24 +18,53 @@ class Scraper(object):
         self.league_id = league_id
         self.season_id = season_id
 
-    def get_clubhouse(self, team_id, week):
-        url = 'http://games.espn.com/ffl/clubhouse'
-        args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
+    def get_teams(self, team_count, week):
+        """Gets information from multiple sources and merges them into one data model."""
+        teams = self.get_teams_scoreboard(team_count, week)
+
+        for team_id in range(1, team_count + 1):
+            players_boxscore = self.get_players_boxscore(team_id, week)
+            players_projections = self.get_players_clubhouse(team_id, week)
+
+            for key, player in players_boxscore.items():
+                player.merge(players_projections[key])
+
+            teams[team_id].players = players_boxscore
+            print('Loaded team #{0}: {1}'.format(team_id, teams[team_id].team_name))
+
+        return teams
+
+    def get_teams_scoreboard(self, team_count, week):
+        url = 'http://games.espn.com/ffl/scoreboard'
+        args = {'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week}
 
         soup = self.__get_soup(url, args)
-        table = soup.find('table', class_='playerTableTable')
 
-        players = {}
+        teams = [Team(-1)]  # 1-based indexing for teams
 
-        rows = table.find_all('tr', class_='pncPlayerRow')
-        for row in rows:
-            player_projection = Player(team_id)
-            player_projection.parse_clubhouse(row)
-            players[player_projection.id] = player_projection
+        for team_id in range(1, team_count + 1):
+            team_row = soup.find('tr', id='teamscrg_{0}_activeteamrow'.format(team_id))
+            team = Team(team_id)
 
-        return players
+            team_name = team_row.find('div', class_='name')
+            team.team_name = team_name.find('a').string
+            team.team_name_short = team_name.find('span').string
 
-    def get_boxscore(self, team_id, week):
+            team_score = team_row.find('td', class_='score')
+            team.score = float(team_score.string)
+
+            opp_name = team_row.previous_sibling
+            if opp_name is None:
+                opp_name = team_row.next_sibling
+
+            opp_id_string = opp_name.attrs['id']
+            team.opponent_id = int(opp_id_string.split('_')[1])  # this line assumes a lot :)
+
+            teams.append(team)
+
+        return teams
+
+    def get_players_boxscore(self, team_id, week):
         url = "http://games.espn.com/ffl/boxscorefull"
         args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
 
@@ -51,25 +81,43 @@ class Scraper(object):
                 # We ran into the opponent's table
                 break
 
-            table_type = table.find('tr', class_='playerTableBgRowSubhead').find('th', class_='playertableSectionHeaderFirst').string
+            table_type = table.find('tr', class_='playerTableBgRowSubhead')\
+                .find('th', class_='playertableSectionHeaderFirst').string
             if 'OFFENSIVE PLAYERS' in table_type:
                 rows = table.find_all('tr', class_='pncPlayerRow')
                 for row in rows:
                     player_boxscore = Player(team_id)
                     player_boxscore.parse_boxscore_offense(row)
-                    players[player_boxscore.id] = player_boxscore
+                    players[player_boxscore.player_id] = player_boxscore
             elif 'KICKERS' in table_type:
                 rows = table.find_all('tr', class_='pncPlayerRow')
                 for row in rows:
                     player_boxscore = Player(team_id)
                     player_boxscore.parse_boxscore_kicker(row)
-                    players[player_boxscore.id] = player_boxscore
+                    players[player_boxscore.player_id] = player_boxscore
             elif 'TEAM D/ST' in table_type:
                 rows = table.find_all('tr', class_='pncPlayerRow')
                 for row in rows:
                     player_boxscore = Player(team_id)
                     player_boxscore.parse_boxscore_defense(row)
-                    players[player_boxscore.id] = player_boxscore
+                    players[player_boxscore.player_id] = player_boxscore
+
+        return players
+
+    def get_players_clubhouse(self, team_id, week):
+        url = 'http://games.espn.com/ffl/clubhouse'
+        args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
+
+        soup = self.__get_soup(url, args)
+        table = soup.find('table', class_='playerTableTable')
+
+        players = {}
+
+        rows = table.find_all('tr', class_='pncPlayerRow')
+        for row in rows:
+            player_projection = Player(team_id)
+            player_projection.parse_clubhouse(row)
+            players[player_projection.player_id] = player_projection
 
         return players
 

@@ -9,17 +9,45 @@ for line in config:
     pair = line.strip().split('=')
     args[pair[0]] = pair[1]
 
+week_id = args['week_id']
+team_count = int(args['team_count'])
+
 espn = Scraper(args['league_id'], args['season_id'])
 
-all_players = {}
+all_active = {}
+all_bench = {}
+all_teams = espn.get_teams(team_count, week_id)
 
-week_id = args['week_id']
-for team_id in range(1, int(args['team_count']) + 1):
-    players_projections = espn.get_clubhouse(team_id, week_id)
-    players_boxscore = espn.get_boxscore(team_id, week_id)
+print('-------------------------')
 
-    for key, player in players_boxscore.items():
-        all_players[key] = player
+for team in all_teams[1:]:
+    print('TEAM {0} {1} - {2} pts'.format(team.team_name, team.team_name_short, team.score))
 
-for key, player in all_players.items():
-    print('{0}, {1} ({2}): {3} pts'.format(player.name, player.slot, player.team_id, player.points))
+    active = [player for player in team.players.values() if player.slot != 'Bench']
+    bench = [player for player in team.players.values() if player.slot == 'Bench']
+
+    active_score = 0.0
+    for player in active:
+        print('\t{0}\t| {1} {2}: {3}/{4} pts'.format(player.slot,
+                                                    player.name,
+                                                    team.team_name_short,
+                                                    player.points,
+                                                    player.projected_points))
+        active_score += player.points
+        all_active[player.player_id] = player
+
+    print('\t\tTotal: {0}'.format(active_score))
+    print()
+
+    bench_score = 0.0
+    for player in bench:
+        print('\t{0} | {1} {2}: {3}/{4} pts'.format(player.slot,
+                                                    player.name,
+                                                    team.team_name_short,
+                                                    player.points,
+                                                    player.projected_points))
+        bench_score += player.points
+        all_bench[player.player_id] = player
+
+    print('\t\tTotal: {0}'.format(bench_score))
+    print()

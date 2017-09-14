@@ -1,5 +1,5 @@
 #
-# Class model for a single player with aggregated stats
+# Class model for a single player with aggregated stats for a given week.
 #
 
 player_column = 'PLAYER, TEAM POS'
@@ -95,7 +95,7 @@ class Player(object):
     """
 
     def __init__(self, team_id):
-        self.id = 'default'
+        self.player_id = 'default'
         self.team_id = team_id
 
         for value in special_attributes + \
@@ -105,7 +105,7 @@ class Player(object):
                 boxscore_defense_attributes:
             if value is None:
                 continue
-            self.__dict__[value] = ''
+            self.__dict__[value] = None
 
     def parse_clubhouse(self, row):
         self.parse(row, clubhouse_attributes)
@@ -128,16 +128,16 @@ class Player(object):
             if header is None:
                 continue
 
-            # The player, team & position column is a special case.
             if header == player_column:
+                # Special Case: PLAYER, TEAM POS column is actually three values
                 name_parts = list(column.children)
 
                 # if someone left an empty spot in their lineup
                 if len(name_parts) == 1:
-                    self.id = 'empty'
+                    self.player_id = 'empty'
                     continue
 
-                self.id = column.attrs['id']
+                self.player_id = column.attrs['id']
                 self.__dict__['name'] = name_parts[0].string
 
                 team_pos = name_parts[1].string.split()
@@ -147,10 +147,27 @@ class Player(object):
                 else:
                     self.__dict__['team'] = team_pos[1]
                     self.__dict__['pos'] = team_pos[2]
+            elif header == 'opponent' and column.text == '** BYE **':
+                # Special Case: ** BYE ** week makes the table have fewer columns.
+                self.__dict__[column_titles[column_index]] = column.text
+                column_index += 1
+                self.__dict__[column_titles[column_index]] = column.text
             else:
-                self.__dict__[header] = column.string
+                # Base Case: Attempt to parse a numeric value if you can.
+                try:
+                    val = column.text
+                    if val == '--':
+                        val = '0'
+
+                    if '.' in val:
+                        self.__dict__[header] = float(val)
+                    else:
+                        self.__dict__[header] = int(val)
+
+                except ValueError:
+                    self.__dict__[header] = column.text
 
     def merge(self, o):
         for key, value in o.__dict__.items():
-            if self.__dict__[key] is None:
+            if value is not None and self.__dict__[key] is None:
                 self.__dict__[key] = value
