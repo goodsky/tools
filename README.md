@@ -13,3 +13,4 @@ Repository for various unpolished or incomplete tools before warrenting its own 
 | brain-ram            | 03/08/2014 | Windows Phone app to store common references for puzzle solving.                          |
 | image-sorter         | 08/28/2016 | .NET app to merge images with different file naming conventions- like honeymoon photos.   |
 | clr-safari           | 01/28/2017 | Set of experiments to help understand the .NET CLR and CoreFx.                            |
+| ffautoblogger        | 09/11/2017 | Fantasy Football weekly summary blog assist                                               |
