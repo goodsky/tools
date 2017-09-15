@@ -4,8 +4,9 @@
 
 import requests
 from bs4 import BeautifulSoup
-from player import Player
-from team import Team
+
+from scraper.player import Player
+from scraper.team import Team
 
 
 class ScraperException(ValueError):

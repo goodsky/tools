@@ -1,6 +1,6 @@
 # Run the fantasy football autoblogger
 
-from scraper import Scraper
+from scraper.scraper import Scraper
 
 args = {}
 
