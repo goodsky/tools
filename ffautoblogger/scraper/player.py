@@ -103,7 +103,7 @@ class Player(object):
                 boxscore_offense_attributes + \
                 boxscore_kicking_attributes + \
                 boxscore_defense_attributes:
-            if value is None:
+            if value is None or value == player_column:
                 continue
             self.__dict__[value] = None
 
