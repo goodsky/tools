@@ -22,6 +22,9 @@ class Blogger(object):
     def blank(self):
         self.__lines.append('<div>&nbsp;</div>\n')
 
+    def horizontal_line(self):
+        self.__lines.append('<hr />\n')
+
     def write_file(self, filename):
         fout = open(filename, 'w')
         fout.writelines(self.__lines)

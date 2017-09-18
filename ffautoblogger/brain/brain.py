@@ -52,27 +52,14 @@ class Brain(object):
             # Star Players are picked by overall top score
             self.blogger.write('Star Players:', bold=True)
             for player in match_players[:3]:
-                self.blogger.write('{0}, {1} {2} {3}: {4:.2f} pts from {5}'\
-                                   .format(player.name,
-                                           player.team if player.team is not None else '',
-                                           player.slot,
-                                           self.teams[player.team_id].team_name_short,
-                                           player.points,
-                                           self.__interesting_stats(player)))
+                self.blogger.write(self.__get_player_summary(player, include_stats=True))
             self.blogger.blank()
 
             # Underachievers are picked by performance vs expectation
             match_players.sort(key=lambda p: p.points - p.projected_points)
             self.blogger.write('Underachievers:', bold=True)
             for player in match_players[:3]:
-                self.blogger.write('{0}, {1} {2} {3}: {4:.2f} pts ({5:.2f} projected) from {6}'\
-                                   .format(player.name,
-                                           player.team if player.team is not None else '',
-                                           player.slot,
-                                           self.teams[player.team_id].team_name_short,
-                                           player.points,
-                                           player.points - player.projected_points,
-                                           self.__interesting_stats(player)))
+                self.blogger.write(self.__get_player_summary(player, include_projected=True, include_stats=True))
             self.blogger.blank()
 
             self.blogger.blank()
@@ -89,13 +76,7 @@ class Brain(object):
         self.blogger.heading('League All-Star Players', underline=True)
         for i in range(count):
             player = self.active_players[i]
-            self.blogger.write('{0}, {1} {2} {3}: {4:.2f} pts (+{5:.2f} over projected)'\
-                               .format( player.name,
-                                        player.team if player.team is not None else '',
-                                        player.slot,
-                                        self.teams[player.team_id].team_name_short,
-                                        player.points,
-                                        player.points - player.projected_points))
+            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
         self.blogger.blank()
 
     def blog_bust_players(self, count=3):
@@ -108,16 +89,61 @@ class Brain(object):
         self.blogger.heading('League Bust Players', underline=True)
         for i in range(count):
             player = self.active_players[i]
-            self.blogger.write('{0}, {1} {2} {3}: {4:.2f} pts (-{5:.2f} under projected)'\
-                               .format( player.name,
-                                        player.team if player.team is not None else '',
-                                        player.slot,
-                                        self.teams[player.team_id].team_name_short,
-                                        player.points,
-                                        player.projected_points - player.points))
+            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
         self.blogger.blank()
 
-    def __interesting_stats(self, player):
+    def blog_bench_star_players(self, count=1):
+        """
+        Write the blog headings for the league-wide bench all-star.
+        """
+
+        self.bench_players.sort(key=lambda p: p.points, reverse=True)
+
+        self.blogger.heading('Best of the Bench', underline=True)
+        for i in range(count):
+            player = self.bench_players[i]
+            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
+        self.blogger.blank()
+
+    def __get_player_summary(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
+        """
+        Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
+        :param include_projected: Includes a short (+/- X projected)
+        :param include_projected_verbose: Includes a longer (+/-X over/under projected)
+        :param include_stats: Includes a long string with interesting stats
+        """
+        projected_delta = player.points - player.projected_points
+        over_projected = projected_delta > 0.0
+
+        projected = ''
+        projected_verbose = ''
+        stats = ''
+
+        if include_projected:
+            projected = '({1}{0:.2f} projected) '.format(
+                projected_delta,
+                '+' if over_projected else '')
+
+        if include_projected_verbose:
+            projected_verbose = '({1}{0:.2f} {2} projected) '.format(
+                projected_delta,
+                '+' if over_projected else '',
+                'over' if over_projected else 'under')
+
+        if include_stats:
+            stats = 'from {0}'.format(self.__get_interesting_stats(player))
+
+        return '{0}, {1} {2} {3}: {4:.2f} pts {5}{6}{7}'.format(
+                    player.name,
+                    player.team if player.team is not None else '',
+                    player.slot,
+                    self.teams[player.team_id].team_name_short,
+                    player.points,
+                    projected,
+                    projected_verbose,
+                    stats)
+
+    def __get_interesting_stats(self, player):
         """
         Compose an interesting string about this player's stats.
         Plenty of room for improvement here. Go hog wild!

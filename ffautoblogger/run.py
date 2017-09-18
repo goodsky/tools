@@ -26,6 +26,8 @@ blogger = Blogger()
 brain = Brain(all_teams, blogger)
 brain.blog_star_players()
 brain.blog_bust_players()
+brain.blog_bench_star_players()
+brain.blogger.horizontal_line()
 brain.blog_match_summaries()
 
 # Write the formatted blog entry for the week
