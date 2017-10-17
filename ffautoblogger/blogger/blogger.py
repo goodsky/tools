@@ -20,7 +20,7 @@ class Blogger(object):
         self.__lines.append('<div>\n' + self.__accent(line, bold, italic, underline) + '\n</div>\n')
 
     def blank(self):
-        self.__lines.append('<div>&nbsp;</div>\n')
+        self.__lines.append('<br />\n')
 
     def horizontal_line(self):
         self.__lines.append('<hr />\n')

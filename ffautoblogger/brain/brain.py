@@ -120,12 +120,12 @@ class Brain(object):
         stats = ''
 
         if include_projected:
-            projected = '({1}{0:.2f} projected) '.format(
+            projected = '({1}{0:.1f} projected) '.format(
                 projected_delta,
                 '+' if over_projected else '')
 
         if include_projected_verbose:
-            projected_verbose = '({1}{0:.2f} {2} projected) '.format(
+            projected_verbose = '({1}{0:.1f}, {2} projected) '.format(
                 projected_delta,
                 '+' if over_projected else '',
                 'over' if over_projected else 'under')
@@ -133,7 +133,7 @@ class Brain(object):
         if include_stats:
             stats = 'from {0}'.format(self.__get_interesting_stats(player))
 
-        return '{0}, {1} {2} {3}: {4:.2f} pts {5}{6}{7}'.format(
+        return '<b>{0}, {1} {2} {3}</b>: {4:.1f} pts {5}{6}{7}'.format(
                     player.name,
                     player.team if player.team is not None else '',
                     player.slot,

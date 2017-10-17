@@ -21,12 +21,13 @@ all_teams = espn.get_teams(team_count, week_id)
 
 # Create the blogging helper to write HTML
 blogger = Blogger()
+blogger.write(' ')
 
 # Use a brain to write interesting blogs
 brain = Brain(all_teams, blogger)
 brain.blog_star_players()
 brain.blog_bust_players()
-brain.blog_bench_star_players()
+brain.blog_bench_star_players(count=3)
 brain.blogger.horizontal_line()
 brain.blog_match_summaries()
 
