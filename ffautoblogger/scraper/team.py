@@ -15,6 +15,15 @@ class Team(object):
         self.players = None
         self.score = 0.0
 
+    def projected_score(self):
+        projected = 0.0
+
+        for key, player in self.players.items():
+            if player.slot != 'Bench':
+                projected += player.projected_points
+
+        return projected
+
     def merge(self, o):
         for key, value in o.__dict__.items():
             if value is not None and self.__dict__[key] is None:

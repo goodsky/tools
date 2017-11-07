@@ -45,6 +45,7 @@ class Brain(object):
             match_players.sort(key=lambda p: p.points, reverse=True)
 
             self.blogger.heading(team.team_name + ' vs ' + opp_team.team_name, underline=True)
+            self.blogger.subheading('PROJECTED SCORE: {0:.1f} - {1:.1f}'.format(team.projected_score(), opp_team.projected_score()))
             self.blogger.subheading('FINAL SCORE: {0} - {1}'.format(team.score, opp_team.score))
             self.blogger.minorheading('WINNER: {0}'.format(team.team_name if team.score > opp_team.score else opp_team.team_name))
             self.blogger.blank()
