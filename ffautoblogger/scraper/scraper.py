@@ -51,12 +51,14 @@ class Scraper(object):
             
             for key, player in players_boxscore1.items():
                 player.merge(players_projections1[key])
-                player.player_id = "1_" + player.player_id
+                player.name = "(1) " + player.name
+                player.player_id = "1-" + player.player_id
                 all_players[player.player_id] = player
             
             for key, player in players_boxscore2.items():
                 player.merge(players_projections2[key])
-                player.player_id = "2_" + player.player_id
+                player.name = "(2) " + player.name
+                player.player_id = "2-" + player.player_id
                 all_players[player.player_id] = player
             
             teams[team_id].players = all_players
