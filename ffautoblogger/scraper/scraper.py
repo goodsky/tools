@@ -34,6 +34,35 @@ class Scraper(object):
             print('Loaded team #{0}: {1}'.format(team_id, teams[team_id].team_name))
 
         return teams
+    
+    def get_teams_playoffs(self, team_count, week):
+        """Gets information from multiple sources and merges them into one data model."""
+        week2 = str(int(week) + 1)
+        teams = self.get_teams_scoreboard(team_count, week)
+        
+        for team_id in range(1, team_count + 1):
+            players_boxscore1 = self.get_players_boxscore(team_id, week)
+            players_projections1 = self.get_players_clubhouse(team_id, week)
+            
+            players_boxscore2 = self.get_players_boxscore(team_id, week2)
+            players_projections2 = self.get_players_clubhouse(team_id, week2)
+            
+            all_players = {}
+            
+            for key, player in players_boxscore1.items():
+                player.merge(players_projections1[key])
+                player.player_id = "1_" + player.player_id
+                all_players[player.player_id] = player
+            
+            for key, player in players_boxscore2.items():
+                player.merge(players_projections2[key])
+                player.player_id = "2_" + player.player_id
+                all_players[player.player_id] = player
+            
+            teams[team_id].players = all_players
+            print('Loaded team #{0}: {1} ({2} players)'.format(team_id, teams[team_id].team_name, len(all_players)))
+
+        return teams
 
     def get_teams_scoreboard(self, team_count, week):
         url = 'http://games.espn.com/ffl/scoreboard'

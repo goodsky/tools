@@ -5,3 +5,9 @@ Simple heuristics are used to find 'interesting' stats from a week to be written
 I am learning Python while writing this, so thanks to the following authors:
 * https://blog.hartleybrody.com/web-scraping/
 * https://github.com/pcsforeducation/fantasy
+
+## Install Packages
+* Requests: http://docs.python-requests.org/en/master/
+* Beautiful Soup: https://www.crummy.com/software/BeautifulSoup/
+
+Install python 3.4+ (it has pip installed by default) and then run `python -m pip install <bla>`
