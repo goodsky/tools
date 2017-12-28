@@ -16,7 +16,7 @@ class Brain(object):
         self.active_players = [player for player in self.players if player.slot != 'Bench']
         self.bench_players = [player for player in self.players if player.slot == 'Bench']
 
-    def blog_match_summaries(self):
+    def blog_match_summaries(self, count=3):
         """
         Write the blog headings for each match's summary.
         Indicate the final score as well as the Star Players and Underachievers.
@@ -52,14 +52,14 @@ class Brain(object):
 
             # Star Players are picked by overall top score
             self.blogger.write('Star Players:', bold=True)
-            for player in match_players[:3]:
+            for player in match_players[:count]:
                 self.blogger.write(self.__get_player_summary(player, include_stats=True))
             self.blogger.blank()
 
             # Underachievers are picked by performance vs expectation
             match_players.sort(key=lambda p: p.points - p.projected_points)
             self.blogger.write('Underachievers:', bold=True)
-            for player in match_players[:3]:
+            for player in match_players[:count]:
                 self.blogger.write(self.__get_player_summary(player, include_projected=True, include_stats=True))
             self.blogger.blank()
 
