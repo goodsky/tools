@@ -100,6 +100,67 @@ namespace lispc
 		}
 	}
 
+	Number operator>(const Number& n1, const Number& n2)
+	{
+		if (n1.isInteger && n2.isInteger)
+		{
+			return (n1.intValue > n2.intValue) ? Number(1) : Number(0);
+		}
+		else
+		{
+			return (n1.doubleValue > n2.doubleValue) ? Number(1) : Number(0);
+		}
+	}
+
+	Number operator<(const Number& n1, const Number& n2)
+	{
+		if (n1.isInteger && n2.isInteger)
+		{
+			return (n1.intValue < n2.intValue) ? Number(1) : Number(0);
+		}
+		else
+		{
+			return (n1.doubleValue < n2.doubleValue) ? Number(1) : Number(0);
+		}
+	}
+
+	Number operator>=(const Number& n1, const Number& n2)
+	{
+		if (n1.isInteger && n2.isInteger)
+		{
+			return (n1.intValue >= n2.intValue) ? Number(1) : Number(0);
+		}
+		else
+		{
+			return (n1.doubleValue >= n2.doubleValue) ? Number(1) : Number(0);
+		}
+	}
+
+	Number operator<=(const Number& n1, const Number& n2)
+	{
+		if (n1.isInteger && n2.isInteger)
+		{
+			return (n1.intValue <= n2.intValue) ? Number(1) : Number(0);
+		}
+		else
+		{
+			return (n1.doubleValue <= n2.doubleValue) ? Number(1) : Number(0);
+		}
+	}
+
+	Number operator==(const Number& n1, const Number& n2)
+	{
+		if (n1.isInteger && n2.isInteger)
+		{
+			return (n1.intValue == n2.intValue) ? Number(1) : Number(0);
+		}
+		else
+		{
+			// close enough for me
+			return (abs(n1.doubleValue - n2.doubleValue) < 1e-6) ? Number(1) : Number(0);
+		}
+	}
+
 	std::ostream& operator<<(std::ostream& stream, const Number& number)
 	{
 		if (number.isInteger)

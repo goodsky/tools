@@ -114,17 +114,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuiltIns.cpp" />
+    <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="Eval.cpp" />
     <ClCompile Include="Expression.cpp" />
+    <ClCompile Include="LambdaExpression.cpp" />
+    <ClCompile Include="ListExpression.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Number.cpp" />
+    <ClCompile Include="NumberExpression.cpp" />
     <ClCompile Include="Parse.cpp" />
     <ClCompile Include="Symbol.cpp" />
+    <ClCompile Include="SymbolExpression.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BuiltIns.h" />
+    <ClInclude Include="Environment.h" />
+    <ClInclude Include="Eval.h" />
     <ClInclude Include="Expression.h" />
+    <ClInclude Include="LambdaExpression.h" />
+    <ClInclude Include="ListExpression.h" />
     <ClInclude Include="Number.h" />
+    <ClInclude Include="NumberExpression.h" />
     <ClInclude Include="Parse.h" />
     <ClInclude Include="Symbol.h" />
+    <ClInclude Include="SymbolExpression.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

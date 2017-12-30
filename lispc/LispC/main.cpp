@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "Eval.h"
 #include "Expression.h"
 #include "Number.h"
 #include "Parse.h"
@@ -31,6 +32,8 @@ int main(int argc, char* argv[])
 
 void repl()
 {
+	Environment env;
+
 	cout << "LispC repl" << endl;
 	while (true)
 	{
@@ -43,6 +46,15 @@ void repl()
 			break;
 
 		Expression* expression = parse(line);
-		cout << *expression << endl;
+		Expression* result = eval(expression, env);
+
+		if (result == nullptr)
+		{
+			cout << "null" << endl;
+		}
+		else
+		{
+			cout << *result << endl;
+		}
 	}
 }

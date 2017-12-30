@@ -1,6 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * LispC Number
 * Represents an integer or a floating point number
+*
+* I also potentially deviate from the Scheme standard by treating integers 0 & 1 as
+* boolean data types for logic.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -25,6 +28,11 @@ namespace lispc
 		friend Number operator*(const Number& n1, const Number& n2);
 		friend Number operator/(const Number& n1, const Number& n2);
 		friend Number operator%(const Number& n1, const Number& n2);
+		friend Number operator>(const Number& n1, const Number& n2);
+		friend Number operator<(const Number& n1, const Number& n2);
+		friend Number operator>=(const Number& n1, const Number& n2);
+		friend Number operator<=(const Number& n1, const Number& n2);
+		friend Number operator==(const Number& n1, const Number& n2);
 		friend std::ostream& operator<<(std::ostream& stream, const Number& number);
 
 	private:

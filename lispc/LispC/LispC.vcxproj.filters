@@ -12,12 +12,15 @@
     <Filter Include="Lisp">
       <UniqueIdentifier>{81992a74-9323-4d59-b86d-c5324a8a4fdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Expressions">
+      <UniqueIdentifier>{4480af60-b9c6-478f-ab8a-257f29259a3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Expressions">
+      <UniqueIdentifier>{d526a0db-8b44-432a-bb71-7825c14c516f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Expression.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Number.cpp">
@@ -29,11 +32,32 @@
     <ClCompile Include="Parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Eval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BuiltIns.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Expression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
+    <ClCompile Include="LambdaExpression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
+    <ClCompile Include="ListExpression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberExpression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolExpression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Expression.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Number.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,6 +66,30 @@
     </ClInclude>
     <ClInclude Include="Parse.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Eval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuiltIns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Expression.h">
+      <Filter>Header Files\Expressions</Filter>
+    </ClInclude>
+    <ClInclude Include="ListExpression.h">
+      <Filter>Header Files\Expressions</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberExpression.h">
+      <Filter>Header Files\Expressions</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolExpression.h">
+      <Filter>Header Files\Expressions</Filter>
+    </ClInclude>
+    <ClInclude Include="LambdaExpression.h">
+      <Filter>Header Files\Expressions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

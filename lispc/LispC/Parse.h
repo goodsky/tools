@@ -5,6 +5,15 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include <set>
+#include <string>
+#include <vector>
+
+#include "Expression.h"
+#include "ListExpression.h"
+#include "SymbolExpression.h"
+#include "NumberExpression.h"
+
 namespace lispc
 {
 	Expression* parse(std::string& program);

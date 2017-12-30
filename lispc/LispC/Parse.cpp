@@ -1,8 +1,3 @@
-#include <set>
-#include <string>
-#include <vector>
-
-#include "Expression.h"
 #include "Parse.h"
 
 namespace lispc
@@ -44,7 +39,7 @@ namespace lispc
 				if (!isWhitespace && i - start > 0)
 					tokens.push_back(program.substr(start, i - start));
 
-				// start = i; whitespace doesn't need start updated
+				// start = i; don't need to update start for whitespace
 				isWhitespace = true;
 			}
 		}
@@ -77,7 +72,7 @@ namespace lispc
 		else
 		{
 			// atom
-			// laughably inefficient - room to improve here
+			// not the way my grandpa would recommend
 			try 
 			{
 				int intValue = std::stoi(token);
