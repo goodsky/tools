@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * LispC Environment
 * 	 Mapping of defined expressions.
-*    Keeps track of built-in functions as well as defined symbols.
+*    Supports multiple scopes of environments in the case of lambdas.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -18,13 +18,16 @@ namespace lispc
 	{
 	public:
 		Environment();
+		Environment(std::vector<Symbol>& params, std::vector<Expression*>& args, Environment* outer);
 
-		void add(Symbol key, Expression* expression);
+		void set(Symbol key, Expression* expression);
 		Expression* get(Symbol key) const;
+		Environment* find_scope(Symbol key);
 
 	private:
 		Environment(const Environment& other) = delete;
 
 		std::map<Symbol, Expression*> env;
+		Environment* outer;
 	};
 }

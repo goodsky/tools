@@ -118,6 +118,7 @@
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Eval.cpp" />
     <ClCompile Include="Expression.cpp" />
+    <ClCompile Include="FuncExpression.cpp" />
     <ClCompile Include="LambdaExpression.cpp" />
     <ClCompile Include="ListExpression.cpp" />
     <ClCompile Include="main.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Eval.h" />
     <ClInclude Include="Expression.h" />
+    <ClInclude Include="FuncExpression.h" />
     <ClInclude Include="LambdaExpression.h" />
     <ClInclude Include="ListExpression.h" />
     <ClInclude Include="Number.h" />

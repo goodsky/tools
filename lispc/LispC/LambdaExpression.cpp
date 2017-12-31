@@ -2,9 +2,9 @@
 
 namespace lispc
 {
-	LambdaExpression::LambdaExpression(Func func, Environment* env) :
-		Expression("LambdaExpression"),
-		func(func),
+	LambdaExpression::LambdaExpression(Expression* body, std::vector<Symbol>& parameters, Environment* env) :
+		body(body),
+		params(parameters),
 		env(env) {}
 
 	LambdaExpression::~LambdaExpression() { }
@@ -13,8 +13,16 @@ namespace lispc
 
 	bool LambdaExpression::is_lambda() const { return true; }
 
-	Expression* LambdaExpression::invoke(std::vector<Expression*>& args)
+	std::string LambdaExpression::get_type() const { return "LambdaExpression"; }
+
+	Environment* LambdaExpression::bind(std::vector<Expression*>& args)
 	{
-		return func(args);
+		// TODO: leak warning
+		return new Environment(params, args, env);
+	}
+
+	Expression* LambdaExpression::get_body() const
+	{
+		return body;
 	}
 }

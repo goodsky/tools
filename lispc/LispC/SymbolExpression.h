@@ -19,6 +19,8 @@ namespace lispc
 
 		virtual Symbol get_symbol() const override;
 
+		virtual std::string get_type() const override;
+
 	private:
 		Symbol symbol;
 	};

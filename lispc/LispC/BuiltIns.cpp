@@ -7,16 +7,17 @@ namespace lispc
 		std::map<Symbol, Expression*> env;
 		env["true"] = new NumberExpression(1);
 		env["false"] = new NumberExpression(0);
-		env["+"] = new LambdaExpression(&add);
-		env["-"] = new LambdaExpression(&sub);
-		env["*"] = new LambdaExpression(&mul);
-		env["/"] = new LambdaExpression(&div);
-		env["%"] = new LambdaExpression(&mod);
-		env[">"] = new LambdaExpression(&gt);
-		env["<"] = new LambdaExpression(&lt);
-		env[">="] = new LambdaExpression(&gte);
-		env["<="] = new LambdaExpression(&lte);
-		env["="] = new LambdaExpression(&eq);
+		env["pi"] = new NumberExpression(3.141592653589793238462643383279502884);
+		env["+"] = new FuncExpression(&add);
+		env["-"] = new FuncExpression(&sub);
+		env["*"] = new FuncExpression(&mul);
+		env["/"] = new FuncExpression(&div);
+		env["%"] = new FuncExpression(&mod);
+		env[">"] = new FuncExpression(&gt);
+		env["<"] = new FuncExpression(&lt);
+		env[">="] = new FuncExpression(&gte);
+		env["<="] = new FuncExpression(&lte);
+		env["="] = new FuncExpression(&eq);
 
 		return env;
 	}
@@ -29,61 +30,61 @@ namespace lispc
 
 	Expression* add(std::vector<Expression*>& args)
 	{
-		verify_args("add", args, 3);
-		return new NumberExpression(args[1]->get_number() + args[2]->get_number());
+		verify_args("add", args, 2);
+		return new NumberExpression(args[0]->get_number() + args[1]->get_number());
 	}
 
 	Expression* sub(std::vector<Expression*>& args)
 	{
-		verify_args("sub", args, 3);
-		return new NumberExpression(args[1]->get_number() - args[2]->get_number());
+		verify_args("sub", args, 2);
+		return new NumberExpression(args[0]->get_number() - args[1]->get_number());
 	}
 
 	Expression* mul(std::vector<Expression*>& args)
 	{
-		verify_args("mul", args, 3);
-		return new NumberExpression(args[1]->get_number() * args[2]->get_number());
+		verify_args("mul", args, 2);
+		return new NumberExpression(args[0]->get_number() * args[1]->get_number());
 	}
 
 	Expression* div(std::vector<Expression*>& args)
 	{
-		verify_args("div", args, 3);
-		return new NumberExpression(args[1]->get_number() / args[2]->get_number());
+		verify_args("div", args, 2);
+		return new NumberExpression(args[0]->get_number() / args[1]->get_number());
 	}
 
 	Expression* mod(std::vector<Expression*>& args)
 	{
-		verify_args("mod", args, 3);
-		return new NumberExpression(args[1]->get_number() % args[2]->get_number());
+		verify_args("mod", args, 2);
+		return new NumberExpression(args[0]->get_number() % args[1]->get_number());
 	}
 
 	Expression* gt(std::vector<Expression*>& args)
 	{
-		verify_args("gt", args, 3);
-		return new NumberExpression(args[1]->get_number() > args[2]->get_number());
+		verify_args("gt", args, 2);
+		return new NumberExpression(args[0]->get_number() > args[1]->get_number());
 	}
 
 	Expression* lt(std::vector<Expression*>& args)
 	{
-		verify_args("lt", args, 3);
-		return new NumberExpression(args[1]->get_number() < args[2]->get_number());
+		verify_args("lt", args, 2);
+		return new NumberExpression(args[0]->get_number() < args[1]->get_number());
 	}
 
 	Expression* gte(std::vector<Expression*>& args)
 	{
-		verify_args("gte", args, 3);
-		return new NumberExpression(args[1]->get_number() >= args[2]->get_number());
+		verify_args("gte", args, 2);
+		return new NumberExpression(args[0]->get_number() >= args[1]->get_number());
 	}
 
 	Expression* lte(std::vector<Expression*>& args)
 	{
-		verify_args("lte", args, 3);
-		return new NumberExpression(args[1]->get_number() <= args[2]->get_number());
+		verify_args("lte", args, 2);
+		return new NumberExpression(args[0]->get_number() <= args[1]->get_number());
 	}
 
 	Expression* eq(std::vector<Expression*>& args)
 	{
-		verify_args("eq", args, 3);
-		return new NumberExpression(args[1]->get_number() == args[2]->get_number());
+		verify_args("eq", args, 2);
+		return new NumberExpression(args[0]->get_number() == args[1]->get_number());
 	}
 }

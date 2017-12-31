@@ -46,7 +46,7 @@ void repl()
 			break;
 
 		Expression* expression = parse(line);
-		Expression* result = eval(expression, env);
+		Expression* result = eval(expression, &env);
 
 		if (result == nullptr)
 		{

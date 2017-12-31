@@ -2,8 +2,8 @@
 
 namespace lispc
 {
-	Expression::Expression(std::string type) :
-		type(type) {}
+	/*Expression::Expression(std::string type) :
+		type(type) {}*/
 
 	Expression::~Expression() { }
 
@@ -13,13 +13,15 @@ namespace lispc
 
 	bool Expression::is_symbol() const { return false; }
 
+	bool Expression::is_func() const { return false; }
+
 	bool Expression::is_lambda() const { return false; }
 
-	std::vector<Expression*> Expression::get_exps() const { throw std::runtime_error(type + " is not a List."); }
+	std::vector<Expression*> Expression::get_exps() const { throw std::runtime_error(get_type() + " is not a List."); }
 
-	Number Expression::get_number() const { throw std::runtime_error(type + " is not a Number."); }
+	Number Expression::get_number() const { throw std::runtime_error(get_type() + " is not a Number."); }
 
-	Symbol Expression::get_symbol() const { throw std::runtime_error(type + " is not a Symbol."); }
+	Symbol Expression::get_symbol() const { throw std::runtime_error(get_type() + " is not a Symbol."); }
 
 	std::ostream& operator<<(std::ostream& stream, const Expression& expression)
 	{

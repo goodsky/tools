@@ -1,6 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 * LispC Built-In Functions
-* 	 Place to define built-in functions
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
@@ -9,7 +8,7 @@
 #include <vector>
 
 #include "Expression.h"
-#include "LambdaExpression.h"
+#include "FuncExpression.h"
 #include "NumberExpression.h"
 #include "Symbol.h"
 

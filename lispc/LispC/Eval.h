@@ -10,5 +10,5 @@
 
 namespace lispc
 {
-	Expression* eval(Expression* expression, Environment& env);
+	Expression* eval(Expression* expression, Environment* env);
 }

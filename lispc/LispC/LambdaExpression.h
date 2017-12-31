@@ -1,25 +1,31 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* LispC ListExpression
-* Represents a function and environment in the AST
+* LispC LambdaExpression
+*    Represents a captured lambda in the AST.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 #pragma once
 
+#include "Environment.h"
 #include "Expression.h"
 
 namespace lispc
 {
-	class Environment;
 	class LambdaExpression : public Expression
 	{
 	public:
-		LambdaExpression(Func func, Environment* env = nullptr);
+		LambdaExpression(Expression* body, std::vector<Symbol>& parameters, Environment* env = nullptr);
 		virtual ~LambdaExpression() override;
+
 		virtual bool is_atom() const override;
 		virtual bool is_lambda() const override;
-		Expression* invoke(std::vector<Expression*>& args);
+
+		virtual std::string get_type() const override;
+
+		Environment* bind(std::vector<Expression*>& args);
+		Expression* get_body() const;
 
 	private:
-		Func func;
+		Expression* body;
+		std::vector<Symbol> params;
 		Environment* env;
 	};
 }

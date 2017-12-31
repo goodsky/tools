@@ -16,6 +16,8 @@ namespace lispc
 
 		virtual std::vector<Expression*> get_exps() const override;
 
+		virtual std::string get_type() const override;
+
 	private:
 		std::vector<Expression*> exps;
 	};

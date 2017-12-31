@@ -3,7 +3,6 @@
 namespace lispc
 {
 	ListExpression::ListExpression(std::vector<Expression*>& exps) :
-		Expression("ListExpression"),
 		exps()
 	{
 		for (unsigned int i = 0; i < exps.size(); ++i)
@@ -19,4 +18,6 @@ namespace lispc
 	}
 
 	std::vector<Expression*> ListExpression::get_exps() const { return this->exps; }
+
+	std::string ListExpression::get_type() const { return "ListExpression"; }
 }

@@ -56,6 +56,9 @@
     <ClCompile Include="SymbolExpression.cpp">
       <Filter>Source Files\Expressions</Filter>
     </ClCompile>
+    <ClCompile Include="FuncExpression.cpp">
+      <Filter>Source Files\Expressions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Number.h">
@@ -89,6 +92,9 @@
       <Filter>Header Files\Expressions</Filter>
     </ClInclude>
     <ClInclude Include="LambdaExpression.h">
+      <Filter>Header Files\Expressions</Filter>
+    </ClInclude>
+    <ClInclude Include="FuncExpression.h">
       <Filter>Header Files\Expressions</Filter>
     </ClInclude>
   </ItemGroup>
