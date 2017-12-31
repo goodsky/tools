@@ -12,4 +12,5 @@ Thanks to Peter Norvig. http://www.norvig.com/lispy.html
 ## Areas of Improvement
 * The Expression type is basically a union of all Expression Types - this doesn't feel right.
 * Memory leaks are sure to exists. Memory management needs a once (or twice) over.
-* LambdaExpression is not fully implemented.
+* This form doesn't work -> ( (repeat twice) 10)
+* This case doesn't evaluate -> (repeat (twice 5))

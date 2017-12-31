@@ -98,4 +98,12 @@
       <Filter>Header Files\Expressions</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Lisp\lambda.lisp">
+      <Filter>Lisp</Filter>
+    </None>
+    <None Include="Lisp\hello_lisp.lisp">
+      <Filter>Lisp</Filter>
+    </None>
+  </ItemGroup>
 </Project>

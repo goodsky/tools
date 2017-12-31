@@ -8,6 +8,7 @@
  * 
  * written by Skyler Goodell
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,6 +29,47 @@ int main(int argc, char* argv[])
 	{
 		repl();
 	}
+	else if (argc == 2)
+	{
+		ifstream source;
+		source.open(string(argv[1]));
+
+		try 
+		{
+			Environment env;
+			string line;
+
+			int lineNumber = 1;
+
+			while (getline(source, line))
+			{
+				cout << lineNumber++ << ") ";
+
+				Expression* expression = parse(line);
+
+				if (expression != nullptr)
+				{
+					Expression* result = eval(expression, &env);
+
+					if (result == nullptr)
+					{
+						cout << "null";
+					}
+					else
+					{
+						cout << *result;
+					}
+				}
+
+				cout << endl;
+			}
+		}
+		catch (const std::exception& ex)
+		{
+			cout << "ERROR: ";
+			cout << ex.what() << endl;
+		}
+	}
 }
 
 void repl()
@@ -45,16 +87,24 @@ void repl()
 		if (line.length() == 0 || line == "exit" || line == "quit")
 			break;
 
-		Expression* expression = parse(line);
-		Expression* result = eval(expression, &env);
+		try 
+		{
+			Expression* expression = parse(line);
+			Expression* result = eval(expression, &env);
 
-		if (result == nullptr)
-		{
-			cout << "null" << endl;
+			if (result == nullptr)
+			{
+				cout << "null" << endl;
+			}
+			else
+			{
+				cout << *result << endl;
+			}
 		}
-		else
+		catch (const std::exception& ex)
 		{
-			cout << *result << endl;
+			cout << "ERROR: ";
+			cout << ex.what() << endl;
 		}
 	}
 }

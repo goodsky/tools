@@ -142,6 +142,10 @@
     <ClInclude Include="Symbol.h" />
     <ClInclude Include="SymbolExpression.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Lisp\hello_lisp.lisp" />
+    <None Include="Lisp\lambda.lisp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
