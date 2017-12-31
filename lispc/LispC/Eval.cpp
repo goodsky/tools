@@ -12,7 +12,7 @@ namespace lispc
 		{
 			return env->get(expression->get_symbol());
 		}
-		else // ListExpression
+		else if (!expression->is_atom()) // ListExpression
 		{
 			auto inner = expression->get_exps();
 
@@ -21,16 +21,16 @@ namespace lispc
 
 			Expression* instruction = inner[0];
 
-			if (instruction->is_number())
+			if (!instruction->is_atom()) // Nested ListExpression
 			{
-				if (inner.size() != 1)
-					throw std::runtime_error("SYNTAX: Numeric expression is not an instruction.");
-
-				return instruction;
+				instruction = eval(instruction, env);
 			}
-			else if (instruction->is_symbol())
+			
+			if (instruction->is_symbol()) // Symbol as instruction
 			{
 				Symbol key = instruction->get_symbol();
+
+				// Built-In Instruction Keys
 
 				if (key == "quote") // quotation 
 				{
@@ -64,6 +64,8 @@ namespace lispc
 						throw new std::runtime_error("SYNTAX: define expression requires a symbol.");
 
 					env->set(symbol->get_symbol(), eval(inner[2], env));
+
+					return nullptr;
 				}
 				else if (key == "set") // assignment (I broke the language and named this 'set' instead of 'set!')
 				{
@@ -97,47 +99,50 @@ namespace lispc
 					// TODO: leak warning
 					return new LambdaExpression(inner[2], params, env);
 				}
-				else // Resolve Symbol
+				else 
 				{
-					Expression* proc = eval(instruction, env);
-
-					if (proc->is_number())
-					{
-						return proc;
-					}
-					else if (proc->is_func())
-					{
-						FuncExpression* func = static_cast<FuncExpression*>(proc);
-
-						std::vector<Expression*> resolvedArgs;
-
-						for (unsigned int i = 1; i < inner.size(); ++i)
-							resolvedArgs.push_back(eval(inner[i], env));
-
-						return func->invoke(resolvedArgs);
-					}
-					else if (proc->is_lambda())
-					{
-						LambdaExpression* lambda = static_cast<LambdaExpression*>(proc);
-
-						std::vector<Expression*> resolvedArgs;
-						for (unsigned int i = 1; i < inner.size(); ++i)
-							resolvedArgs.push_back(eval(inner[i], env));
-
-						return eval(lambda->get_body(), lambda->bind(resolvedArgs));
-					}
-					else
-					{
-						throw std::runtime_error("SYNTAX: Symbol did not resolve to a procedure.");
-					}
+					// Resolve Symbol from the environment
+					instruction = eval(instruction, env);
 				}
+			}
+
+			if (instruction->is_number()) // Attempt to execute the resolved instruction
+			{
+				if (inner.size() != 1)
+					throw std::runtime_error("SYNTAX: Numeric expression is not an instruction.");
+
+				return instruction;
+			}
+			else if (instruction->is_func())
+			{
+				FuncExpression* func = static_cast<FuncExpression*>(instruction);
+
+				std::vector<Expression*> resolvedArgs;
+
+				for (unsigned int i = 1; i < inner.size(); ++i)
+					resolvedArgs.push_back(eval(inner[i], env));
+
+				return func->invoke(resolvedArgs);
+			}
+			else if (instruction->is_lambda())
+			{
+				LambdaExpression* lambda = static_cast<LambdaExpression*>(instruction);
+
+				std::vector<Expression*> resolvedArgs;
+				for (unsigned int i = 1; i < inner.size(); ++i)
+					resolvedArgs.push_back(eval(inner[i], env));
+
+				return eval(lambda->get_body(), lambda->bind(resolvedArgs));
 			}
 			else
 			{
-				throw std::runtime_error("SYNTAX: Expected symbol or number inside list.");
+				throw std::runtime_error("SYNTAX: Missing instruction in list. First expression must be a number, func or lambda.");
 			}
 		}
-
+		else
+		{
+			throw std::runtime_error("SYNTAX: Expression is unbound func or lambda.");
+		}
 
 		return nullptr;
 	}

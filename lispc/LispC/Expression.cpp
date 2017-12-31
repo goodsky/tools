@@ -33,6 +33,10 @@ namespace lispc
 		{
 			stream << "[SYMBOL: " << expression.get_symbol() << "]";
 		}
+		else if (expression.is_func())
+		{
+			stream << "[FUNC]";
+		}
 		else if (expression.is_lambda())
 		{
 			stream << "[LAMBDA]";

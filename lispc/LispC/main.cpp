@@ -90,15 +90,19 @@ void repl()
 		try 
 		{
 			Expression* expression = parse(line);
-			Expression* result = eval(expression, &env);
 
-			if (result == nullptr)
+			if (expression != nullptr)
 			{
-				cout << "null" << endl;
-			}
-			else
-			{
-				cout << *result << endl;
+				Expression* result = eval(expression, &env);
+
+				if (result == nullptr)
+				{
+					cout << "null" << endl;
+				}
+				else
+				{
+					cout << *result << endl;
+				}
 			}
 		}
 		catch (const std::exception& ex)
