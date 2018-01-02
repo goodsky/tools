@@ -24,7 +24,8 @@ all_teams = espn.get_teams_playoffs(team_count, clubhouse_id, week_id)
 
 # Create the blogging helper to write HTML
 blogger = Blogger()
-blogger.write(' ')
+blogger.blank()
+blogger.blank()
 
 # Use a brain to write interesting blogs
 brain = Brain(all_teams, blogger)

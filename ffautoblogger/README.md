@@ -11,3 +11,6 @@ I am learning Python while writing this, so thanks to the following authors:
 * Beautiful Soup: https://www.crummy.com/software/BeautifulSoup/
 
 Install python 3.4+ (it has pip installed by default) and then run `python -m pip install <bla>`
+
+## Post-season weirdness
+The post-season is set up differently from the regular season. So the run_playoffs script was created. Keep in mind that ESPN's website changes the format of the players tables after the entire season is over. So the player.py had different clubhouse schemas for these two cases.
