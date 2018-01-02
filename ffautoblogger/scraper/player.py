@@ -29,6 +29,22 @@ clubhouse_attributes = [
     'delta_own',            # +/-
 ]
 
+clubhouse_attributes_offseason = [
+    'slot',                 # SLOT
+    player_column,          # Special case for PLAYER, TEAM POS
+    None,                   # - blank -
+    'rank',                 # PRK
+    'total_points',         # PTS
+    'average_points',       # AVG
+    'last_points',          # LAST
+    None,                   # - blank -
+    'projected_points',     # PROJ
+    'opponent_rank',        # OPRK
+    'percent_start',        # %ST
+    'percent_own',          # %OWN
+    'delta_own',            # +/-
+]
+
 boxscore_offense_attributes = [
     'slot',                 # SLOT
     player_column,          # Special case for PLAYER, TEAM POS
@@ -108,7 +124,7 @@ class Player(object):
             self.__dict__[value] = None
 
     def parse_clubhouse(self, row):
-        self.parse(row, clubhouse_attributes)
+        self.parse(row, clubhouse_attributes_offseason)
 
     def parse_boxscore_offense(self, row):
         self.parse(row, boxscore_offense_attributes)

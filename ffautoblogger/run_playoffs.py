@@ -14,12 +14,13 @@ for line in config:
     args[pair[0]] = pair[1]
 
 # Week is the first of the two weeks
+clubhouse_id = args['clubhouse_id']
 week_id = args['week_id']
 team_count = int(args['team_count'])
 
 # Scrape all team data from the ESPN website
 espn = Scraper(args['league_id'], args['season_id'])
-all_teams = espn.get_teams_playoffs(team_count, week_id)
+all_teams = espn.get_teams_playoffs(team_count, clubhouse_id, week_id)
 
 # Create the blogging helper to write HTML
 blogger = Blogger()

@@ -35,10 +35,10 @@ class Scraper(object):
 
         return teams
     
-    def get_teams_playoffs(self, team_count, week):
+    def get_teams_playoffs(self, team_count, clubhouse_week, week):
         """Gets information from multiple sources and merges them into one data model."""
         week2 = str(int(week) + 1)
-        teams = self.get_teams_scoreboard(team_count, week)
+        teams = self.get_teams_scoreboard(team_count, clubhouse_week)
         
         for team_id in range(1, team_count + 1):
             players_boxscore1 = self.get_players_boxscore(team_id, week)
