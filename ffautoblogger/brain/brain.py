@@ -9,7 +9,7 @@ class Brain(object):
         self.blogger = blogger
 
         self.players = []
-        for team in teams[1:]:
+        for team in teams.values():
             for player in team.players.values():
                 self.players.append(player)
 
@@ -22,7 +22,7 @@ class Brain(object):
         Indicate the final score as well as the Star Players and Underachievers.
         """
 
-        top_teams = list(self.teams[1:])
+        top_teams = list(self.teams.values())
         top_teams.sort(key=lambda t: t.score, reverse=True)
 
         seen_match = set()

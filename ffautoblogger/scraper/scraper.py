@@ -4,6 +4,7 @@
 
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse, parse_qs
 
 from scraper.player import Player
 from scraper.team import Team
@@ -19,33 +20,33 @@ class Scraper(object):
         self.league_id = league_id
         self.season_id = season_id
 
-    def get_teams(self, team_count, week):
+    def get_teams(self, week):
         """Gets information from multiple sources and merges them into one data model."""
-        teams = self.get_teams_scoreboard(team_count, week)
+        teams = self.get_teams_scoreboard(week)
 
-        for team_id in range(1, team_count + 1):
-            players_boxscore = self.get_players_boxscore(team_id, week)
-            players_projections = self.get_players_clubhouse(team_id, week)
+        for team in teams.values():
+            players_boxscore = self.get_players_boxscore(team.team_id, week)
+            players_projections = self.get_players_clubhouse(team.team_id, week)
 
             for key, player in players_boxscore.items():
                 player.merge(players_projections[key])
 
-            teams[team_id].players = players_boxscore
-            print('Loaded team #{0}: {1}'.format(team_id, teams[team_id].team_name))
+            team.players = players_boxscore
+            print('Loaded team #{0}: {1}'.format(team.team_id, team.team_name))
 
         return teams
     
-    def get_teams_playoffs(self, team_count, clubhouse_week, week):
+    def get_teams_playoffs(self, clubhouse_week, week):
         """Gets information from multiple sources and merges them into one data model."""
         week2 = str(int(week) + 1)
-        teams = self.get_teams_scoreboard(team_count, clubhouse_week)
+        teams = self.get_teams_scoreboard(clubhouse_week)
         
-        for team_id in range(1, team_count + 1):
-            players_boxscore1 = self.get_players_boxscore(team_id, week)
-            players_projections1 = self.get_players_clubhouse(team_id, week)
+        for team in teams.values():
+            players_boxscore1 = self.get_players_boxscore(team.team_id, week)
+            players_projections1 = self.get_players_clubhouse(team.team_id, week)
             
-            players_boxscore2 = self.get_players_boxscore(team_id, week2)
-            players_projections2 = self.get_players_clubhouse(team_id, week2)
+            players_boxscore2 = self.get_players_boxscore(team.team_id, week2)
+            players_projections2 = self.get_players_clubhouse(team.team_id, week2)
             
             all_players = {}
             
@@ -61,38 +62,45 @@ class Scraper(object):
                 player.player_id = "2-" + player.player_id
                 all_players[player.player_id] = player
             
-            teams[team_id].players = all_players
-            print('Loaded team #{0}: {1} ({2} players)'.format(team_id, teams[team_id].team_name, len(all_players)))
+            team.players = all_players
+            print('Loaded team #{0}: {1} ({2} players)'.format(team.team_id, team.team_name, len(all_players)))
 
         return teams
 
-    def get_teams_scoreboard(self, team_count, week):
+    def get_teams_scoreboard(self, week):
         url = 'http://games.espn.com/ffl/scoreboard'
         args = {'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week}
 
-        soup = self.__get_soup(url, args)
+        scoreboard = self.__get_soup(url, args)
+        team_rows = scoreboard.find_all('td', class_='team')
 
-        teams = [Team(-1)]  # 1-based indexing for teams
+        teams = {}
+        for team_row in team_rows:
+            name_row = team_row.find('div', class_='name')
+            name_link = name_row.find('a')
+            name_span = name_row.find('span')
+            score_row = team_row.parent.find('td', class_='score')
 
-        for team_id in range(1, team_count + 1):
-            team_row = soup.find('tr', id='teamscrg_{0}_activeteamrow'.format(team_id))
+            clubhouse_link = name_link.get('href')
+            team_id = self.__get_team_id(clubhouse_link)
+            team_name = name_link.string
+            team_name_short = name_span.string
+            team_score = float(score_row.string)
+
             team = Team(team_id)
+            team.team_name = team_name
+            team.team_name_short = team_name_short
+            team.score = team_score
 
-            team_name = team_row.find('div', class_='name')
-            team.team_name = team_name.find('a').string
-            team.team_name_short = team_name.find('span').string
-
-            team_score = team_row.find('td', class_='score')
-            team.score = float(team_score.string)
-
-            opp_name = team_row.previous_sibling
+            opp_name = team_row.parent.previous_sibling
             if opp_name is None:
-                opp_name = team_row.next_sibling
+                opp_name = team_row.parent.next_sibling
 
             opp_id_string = opp_name.attrs['id']
-            team.opponent_id = int(opp_id_string.split('_')[1])  # this line assumes a lot :)
+            team.opponent_id = int(opp_id_string.split('_')[1])     # this line assumes a lot :)
+                                                                    # but maybe this is an okay way to get the team id?
 
-            teams.append(team)
+            teams[team.team_id] = team
 
         return teams
 
@@ -152,6 +160,11 @@ class Scraper(object):
             players[player_projection.player_id] = player_projection
 
         return players
+
+    def __get_team_id(self, url):
+        parsed_url = urlparse(url)
+        query_strings = parse_qs(parsed_url.query)
+        return int(query_strings['teamId'][0])
 
     def __get_soup(self, url, args):
         response = requests.get(url, params=args)

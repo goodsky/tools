@@ -13,18 +13,19 @@ def run():
         pair = line.strip().split('=')
         args[pair[0]] = pair[1]
 
+    league_id = args['league_id']
+    season_id = args['season_id']
     week_id = args['week_id']
-    team_count = int(args['team_count'])
 
-    espn = Scraper(args['league_id'], args['season_id'])
+    espn = Scraper(league_id, season_id)
 
     all_active = {}
     all_bench = {}
-    all_teams = espn.get_teams(team_count, week_id)
+    all_teams = espn.get_teams(week_id)
 
     print('-------------------------')
 
-    for team in all_teams[1:]:
+    for team in all_teams.values():
         print('TEAM {0} {1} - {2} pts'.format(team.team_name, team.team_name_short, team.score))
 
         active = [player for player in team.players.values() if player.slot != 'Bench']

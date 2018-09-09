@@ -124,7 +124,7 @@ class Player(object):
             self.__dict__[value] = None
 
     def parse_clubhouse(self, row):
-        self.parse(row, clubhouse_attributes_offseason)
+        self.parse(row, clubhouse_attributes)
 
     def parse_boxscore_offense(self, row):
         self.parse(row, boxscore_offense_attributes)
