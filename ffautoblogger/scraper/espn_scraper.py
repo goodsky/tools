@@ -1,27 +1,22 @@
-#
-# Web Scraper to read data from the ESPN Fantasy Football website
-#
+#!/bin/usr/env python3
 
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, parse_qs
 
 from scraper.player import Player
 from scraper.team import Team
 
 
-class ScraperException(ValueError):
-    pass
-
-
-class Scraper(object):
+class ESPNScraper(object):
+    """ Tools to load Fantasy Football league, team and player data from the ESPN fantasy football public website. """
 
     def __init__(self, league_id, season_id):
+        """ Create a scraper for the given league, season and week"""
         self.league_id = league_id
         self.season_id = season_id
 
     def get_teams(self, week):
-        """Gets information from multiple sources and merges them into one data model."""
+        """Gets team data from multiple sources and merges them into one data model."""
         teams = self.get_teams_scoreboard(week)
 
         for team in teams.values():
@@ -68,10 +63,13 @@ class Scraper(object):
         return teams
 
     def get_teams_scoreboard(self, week):
+        """Loads the scoreboard page with the current score and matchups of each team
+        Returns: Dictionary of Teams indexed by team_id with data that is scraped from the scoreboard.
+        """
         url = 'http://games.espn.com/ffl/scoreboard'
-        args = {'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week}
+        args = { 'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week }
 
-        scoreboard = self.__get_soup(url, args)
+        scoreboard = get_webpage(url, args)
         team_rows = scoreboard.find_all('td', class_='team')
 
         teams = {}
@@ -81,8 +79,7 @@ class Scraper(object):
             name_span = name_row.find('span')
             score_row = team_row.parent.find('td', class_='score')
 
-            clubhouse_link = name_link.get('href')
-            team_id = self.__get_team_id(clubhouse_link)
+            team_id = int(team_row.parent.attrs['id'].split('_')[1])
             team_name = name_link.string
             team_name_short = name_span.string
             team_score = float(score_row.string)
@@ -97,18 +94,19 @@ class Scraper(object):
                 opp_name = team_row.parent.next_sibling
 
             opp_id_string = opp_name.attrs['id']
-            team.opponent_id = int(opp_id_string.split('_')[1])     # this line assumes a lot :)
-                                                                    # but maybe this is an okay way to get the team id?
+            team.opponent_id = int(opp_id_string.split('_')[1])
 
             teams[team.team_id] = team
 
         return teams
 
     def get_players_boxscore(self, team_id, week):
+        """Loads the boxscore page with details about the performance of each player.
+        Returns: List of players for the requested team and week with current performance data."""
         url = "http://games.espn.com/ffl/boxscorefull"
         args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
 
-        soup = self.__get_soup(url, args)
+        soup = get_webpage(url, args)
 
         players = {}
 
@@ -145,14 +143,15 @@ class Scraper(object):
         return players
 
     def get_players_clubhouse(self, team_id, week):
+        """Loads the clubhouse data for a player. This includes the projections and historic performance of players.
+        Returns. List of players for the requested team and week with projection data."""
         url = 'http://games.espn.com/ffl/clubhouse'
         args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
 
-        soup = self.__get_soup(url, args)
+        soup = get_webpage(url, args)
         table = soup.find('table', class_='playerTableTable')
 
         players = {}
-
         rows = table.find_all('tr', class_='pncPlayerRow')
         for row in rows:
             player_projection = Player(team_id)
@@ -161,15 +160,16 @@ class Scraper(object):
 
         return players
 
-    def __get_team_id(self, url):
-        parsed_url = urlparse(url)
-        query_strings = parse_qs(parsed_url.query)
-        return int(query_strings['teamId'][0])
-
-    def __get_soup(self, url, args):
+def get_webpage(url, args):
+    """Make a request to the webpage and return the BeautifulSoup parsed result. 
+    Raises: ConnectionError
+    """
+    try:
         response = requests.get(url, params=args)
+    except requests.exceptions.ConnectionError:
+        raise ConnectionError('Failed to GET the webpage! URL={0} params={1}'.format(url, args))
 
-        if response.status_code != 200:
-            raise Exception('Could not reach the espn website! URL={0} params={1}'.format(url, args))
+    if (response.status_code != 200):
+        raise ConnectionError('Page returned non-success status code. Status: {0} URL={1} params={2}'.format(response.status_code, url, args))
 
-        return BeautifulSoup(response.content, 'html.parser')
+    return BeautifulSoup(response.content, 'html.parser')

@@ -1,6 +1,3 @@
-#
-# Class model for a single player with aggregated stats for a given week.
-#
 
 player_column = 'PLAYER, TEAM POS'
 
@@ -106,9 +103,7 @@ boxscore_defense_attributes = [
 
 
 class Player(object):
-    """
-    Class representing an NFL player
-    """
+    """Class representing an NFL player."""
 
     def __init__(self, team_id):
         self.player_id = 'default'
@@ -136,6 +131,7 @@ class Player(object):
         self.parse(row, boxscore_defense_attributes)
 
     def parse(self, row, column_titles):
+        """Parse player information from the data row."""
         column_index = -1
         for column in row.children:
             column_index += 1
@@ -184,6 +180,7 @@ class Player(object):
                     self.__dict__[header] = column.text
 
     def merge(self, o):
+        """Add values from the other player data source into this instance."""
         for key, value in o.__dict__.items():
             if value is not None and self.__dict__[key] is None:
                 self.__dict__[key] = value
