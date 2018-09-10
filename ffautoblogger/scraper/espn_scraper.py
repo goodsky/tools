@@ -1,6 +1,4 @@
-#
-# Web Scraper to read data from the ESPN Fantasy Football website
-#
+#!/bin/usr/env python3
 
 import requests
 from bs4 import BeautifulSoup
@@ -9,43 +7,41 @@ from scraper.player import Player
 from scraper.team import Team
 
 
-class ScraperException(ValueError):
-    pass
-
-
-class Scraper(object):
+class ESPNScraper(object):
+    """ Tools to load Fantasy Football league, team and player data from the ESPN fantasy football public website. """
 
     def __init__(self, league_id, season_id):
+        """ Create a scraper for the given league, season and week"""
         self.league_id = league_id
         self.season_id = season_id
 
-    def get_teams(self, team_count, week):
-        """Gets information from multiple sources and merges them into one data model."""
-        teams = self.get_teams_scoreboard(team_count, week)
+    def get_teams(self, week):
+        """Gets team data from multiple sources and merges them into one data model."""
+        teams = self.get_teams_scoreboard(week)
 
-        for team_id in range(1, team_count + 1):
-            players_boxscore = self.get_players_boxscore(team_id, week)
-            players_projections = self.get_players_clubhouse(team_id, week)
+        for team in teams.values():
+            players_boxscore = self.get_players_boxscore(team.team_id, week)
+            players_projections = self.get_players_clubhouse(team.team_id, week)
 
             for key, player in players_boxscore.items():
                 player.merge(players_projections[key])
 
-            teams[team_id].players = players_boxscore
-            print('Loaded team #{0}: {1}'.format(team_id, teams[team_id].team_name))
+            team.players = players_boxscore
+            print('Loaded team #{0}: {1}'.format(team.team_id, team.team_name))
 
         return teams
     
-    def get_teams_playoffs(self, team_count, clubhouse_week, week):
+    def get_teams_playoffs(self, clubhouse_week, week):
         """Gets information from multiple sources and merges them into one data model."""
         week2 = str(int(week) + 1)
-        teams = self.get_teams_scoreboard(team_count, clubhouse_week)
+        teams = self.get_teams_scoreboard(clubhouse_week)
         
-        for team_id in range(1, team_count + 1):
-            players_boxscore1 = self.get_players_boxscore(team_id, week)
-            players_projections1 = self.get_players_clubhouse(team_id, week)
+        for team in teams.values():
+            players_boxscore1 = self.get_players_boxscore(team.team_id, week)
+            players_projections1 = self.get_players_clubhouse(team.team_id, week)
             
-            players_boxscore2 = self.get_players_boxscore(team_id, week2)
-            players_projections2 = self.get_players_clubhouse(team_id, week2)
+            players_boxscore2 = self.get_players_boxscore(team.team_id, week2)
+            players_projections2 = self.get_players_clubhouse(team.team_id, week2)
             
             all_players = {}
             
@@ -61,46 +57,56 @@ class Scraper(object):
                 player.player_id = "2-" + player.player_id
                 all_players[player.player_id] = player
             
-            teams[team_id].players = all_players
-            print('Loaded team #{0}: {1} ({2} players)'.format(team_id, teams[team_id].team_name, len(all_players)))
+            team.players = all_players
+            print('Loaded team #{0}: {1} ({2} players)'.format(team.team_id, team.team_name, len(all_players)))
 
         return teams
 
-    def get_teams_scoreboard(self, team_count, week):
+    def get_teams_scoreboard(self, week):
+        """Loads the scoreboard page with the current score and matchups of each team
+        Returns: Dictionary of Teams indexed by team_id with data that is scraped from the scoreboard.
+        """
         url = 'http://games.espn.com/ffl/scoreboard'
-        args = {'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week}
+        args = { 'leagueId': self.league_id, 'seasonId': self.season_id, 'matchupPeriodId': week }
 
-        soup = self.__get_soup(url, args)
+        scoreboard = get_webpage(url, args)
+        team_rows = scoreboard.find_all('td', class_='team')
 
-        teams = [Team(-1)]  # 1-based indexing for teams
+        teams = {}
+        for team_row in team_rows:
+            name_row = team_row.find('div', class_='name')
+            name_link = name_row.find('a')
+            name_span = name_row.find('span')
+            score_row = team_row.parent.find('td', class_='score')
 
-        for team_id in range(1, team_count + 1):
-            team_row = soup.find('tr', id='teamscrg_{0}_activeteamrow'.format(team_id))
+            team_id = int(team_row.parent.attrs['id'].split('_')[1])
+            team_name = name_link.string
+            team_name_short = name_span.string
+            team_score = float(score_row.string)
+
             team = Team(team_id)
+            team.team_name = team_name
+            team.team_name_short = team_name_short
+            team.score = team_score
 
-            team_name = team_row.find('div', class_='name')
-            team.team_name = team_name.find('a').string
-            team.team_name_short = team_name.find('span').string
-
-            team_score = team_row.find('td', class_='score')
-            team.score = float(team_score.string)
-
-            opp_name = team_row.previous_sibling
+            opp_name = team_row.parent.previous_sibling
             if opp_name is None:
-                opp_name = team_row.next_sibling
+                opp_name = team_row.parent.next_sibling
 
             opp_id_string = opp_name.attrs['id']
-            team.opponent_id = int(opp_id_string.split('_')[1])  # this line assumes a lot :)
+            team.opponent_id = int(opp_id_string.split('_')[1])
 
-            teams.append(team)
+            teams[team.team_id] = team
 
         return teams
 
     def get_players_boxscore(self, team_id, week):
+        """Loads the boxscore page with details about the performance of each player.
+        Returns: List of players for the requested team and week with current performance data."""
         url = "http://games.espn.com/ffl/boxscorefull"
         args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
 
-        soup = self.__get_soup(url, args)
+        soup = get_webpage(url, args)
 
         players = {}
 
@@ -137,14 +143,15 @@ class Scraper(object):
         return players
 
     def get_players_clubhouse(self, team_id, week):
+        """Loads the clubhouse data for a player. This includes the projections and historic performance of players.
+        Returns. List of players for the requested team and week with projection data."""
         url = 'http://games.espn.com/ffl/clubhouse'
         args = {'leagueId': self.league_id, 'teamId': team_id, 'seasonId': self.season_id, 'scoringPeriodId': week}
 
-        soup = self.__get_soup(url, args)
+        soup = get_webpage(url, args)
         table = soup.find('table', class_='playerTableTable')
 
         players = {}
-
         rows = table.find_all('tr', class_='pncPlayerRow')
         for row in rows:
             player_projection = Player(team_id)
@@ -153,10 +160,16 @@ class Scraper(object):
 
         return players
 
-    def __get_soup(self, url, args):
+def get_webpage(url, args):
+    """Make a request to the webpage and return the BeautifulSoup parsed result. 
+    Raises: ConnectionError
+    """
+    try:
         response = requests.get(url, params=args)
+    except requests.exceptions.ConnectionError:
+        raise ConnectionError('Failed to GET the webpage! URL={0} params={1}'.format(url, args))
 
-        if response.status_code != 200:
-            raise Exception('Could not reach the espn website! URL={0} params={1}'.format(url, args))
+    if (response.status_code != 200):
+        raise ConnectionError('Page returned non-success status code. Status: {0} URL={1} params={2}'.format(response.status_code, url, args))
 
-        return BeautifulSoup(response.content, 'html.parser')
+    return BeautifulSoup(response.content, 'html.parser')

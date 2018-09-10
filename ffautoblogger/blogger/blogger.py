@@ -26,8 +26,8 @@ class Blogger(object):
         self.__lines.append('<hr />\n')
 
     def write_file(self, filename):
-        fout = open(filename, 'w')
-        fout.writelines(self.__lines)
+        with open(filename, 'w') as fout:
+            fout.writelines(self.__lines)
 
     def __accent(self, line, bold=False, italic=False, underline=False):
         if bold:

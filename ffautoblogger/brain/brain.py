@@ -1,15 +1,13 @@
-#
-# My brain gets tired sometimes. Let's make a new one.
-#
-
 
 class Brain(object):
+    """My brain gets tired sometimes. Let's make a new one."""
+
     def __init__(self, teams, blogger):
         self.teams = teams
         self.blogger = blogger
 
         self.players = []
-        for team in teams[1:]:
+        for team in teams.values():
             for player in team.players.values():
                 self.players.append(player)
 
@@ -17,12 +15,8 @@ class Brain(object):
         self.bench_players = [player for player in self.players if player.slot == 'Bench']
 
     def blog_match_summaries(self, count=3):
-        """
-        Write the blog headings for each match's summary.
-        Indicate the final score as well as the Star Players and Underachievers.
-        """
-
-        top_teams = list(self.teams[1:])
+        """Write the blog headings for each match's summary. Indicate the final score as well as the Star Players and Underachievers."""
+        top_teams = list(self.teams.values())
         top_teams.sort(key=lambda t: t.score, reverse=True)
 
         seen_match = set()
@@ -68,10 +62,7 @@ class Brain(object):
             self.blogger.blank()
 
     def blog_star_players(self, count=3):
-        """
-        Write the blog headings for the league-wide star players.
-        """
-
+        """Write the blog headings for the league-wide star players."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points, reverse=True)
 
         self.blogger.heading('League All-Star Players', underline=True)
@@ -81,10 +72,7 @@ class Brain(object):
         self.blogger.blank()
 
     def blog_bust_players(self, count=3):
-        """
-        Write the blog headings for the league-wide busts.
-        """
-
+        """Write the blog headings for the league-wide busts."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points)
 
         self.blogger.heading('League Bust Players', underline=True)
@@ -94,10 +82,7 @@ class Brain(object):
         self.blogger.blank()
 
     def blog_bench_star_players(self, count=1):
-        """
-        Write the blog headings for the league-wide bench all-star.
-        """
-
+        """Write the blog headings for the league-wide bench all-star."""
         self.bench_players.sort(key=lambda p: p.points, reverse=True)
 
         self.blogger.heading('Best of the Bench', underline=True)
@@ -107,8 +92,7 @@ class Brain(object):
         self.blogger.blank()
 
     def __get_player_summary(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
-        """
-        Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
+        """Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
         :param include_projected: Includes a short (+/- X projected)
         :param include_projected_verbose: Includes a longer (+/-X over/under projected)
         :param include_stats: Includes a long string with interesting stats
@@ -145,11 +129,9 @@ class Brain(object):
                     stats)
 
     def __get_interesting_stats(self, player):
-        """
-        Compose an interesting string about this player's stats.
+        """Compose an interesting string about this player's stats.
         Plenty of room for improvement here. Go hog wild!
         """
-
         if player.slot == 'QB':
             return '{0} yds passing; {1} TD; {2} INT'\
                 .format(player.pass_yds, player.pass_tds + player.rush_tds, player.pass_ints)
