@@ -7,6 +7,9 @@ class Team(object):
         self.team_name = None
         self.team_name_short = None
 
+        self.team_wins = None
+        self.team_losses = None
+
         self.opponent_id = None
         self.opponent_name = None
 

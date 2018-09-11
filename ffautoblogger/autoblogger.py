@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Entry point for the fantasy football auto-blogger"""
+
+import os
 
 from scraper.espn_scraper import ESPNScraper
 from blogger.blogger import Blogger
@@ -7,7 +8,6 @@ from brain.brain import Brain
 
 def main():
     """ Main entry for the auto-blogger program """
-
     args = load_configuration()
     league_id = args['league_id']
     season_id = args['season_id']
@@ -26,21 +26,30 @@ def main():
     blogger = Blogger()
     blogger.blank()
     blogger.blank()
+    blogger.blank()
 
     # Use a brain to write interesting blogs
     brain = Brain(all_teams, blogger)
-    brain.blog_star_players()
-    brain.blog_bust_players()
-    brain.blog_bench_star_players(count=3)
+
+    brain.blogger.horizontal_line()
+    brain.blogger.heading("League Wide Winners and Losers", underline=True, center=True)
+    brain.blog_star_players(count=5)
+    brain.blog_bust_players(count=5)
+    brain.blog_bench_star_players(count=5)
+
     brain.blogger.horizontal_line()
     brain.blog_match_summaries()
 
+    next_week_id = str(int(week_id) + 1)
+    next_week_teams = espn.get_teams_scoreboard(next_week_id)
+    brain.blog_coming_up_next(next_week_id, next_week_teams)
+
     # Write the formatted blog entry for the week
-    blogger.write_file(r'C:\Users\Skyler\Downloads\week_{0}.html'.format(week_id))
+    output_file = os.path.expandvars('%UserProfile%\\Documents\\{0}_week_{1}.html'.format(season_id, week_id))
+    blogger.write_file(output_file)
 
 def load_configuration(file='ffautoblogger.ini'):
-    """ Load the program configuration. """
-
+    """ Load the program configuration ini file. """
     args = {}
     with open(file, 'r') as config:
         for line in config:
