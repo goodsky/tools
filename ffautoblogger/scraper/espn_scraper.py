@@ -81,7 +81,7 @@ class ESPNScraper(object):
 
             team_id = int(team_row.parent.attrs['id'].split('_')[1])
             team_name = name_link.string
-            team_name_short = name_span.string
+            team_name_short = name_span.string[1:-1] # remove the '(' ')'
             team_score = float(score_row.string)
 
             team = Team(team_id)

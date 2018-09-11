@@ -38,23 +38,30 @@ class Brain(object):
 
             match_players.sort(key=lambda p: p.points, reverse=True)
 
-            self.blogger.heading(team.team_name + ' vs ' + opp_team.team_name, underline=True)
-            self.blogger.subheading('PROJECTED SCORE: {0:.1f} - {1:.1f}'.format(team.projected_score(), opp_team.projected_score()))
-            self.blogger.subheading('FINAL SCORE: {0} - {1}'.format(team.score, opp_team.score))
-            self.blogger.minorheading('WINNER: {0}'.format(team.team_name if team.score > opp_team.score else opp_team.team_name))
+            self.blogger.heading(team.team_name + ' vs ' + opp_team.team_name, underline=True, center=True)
+            self.blogger.subheading('WINNER: {0}'.format(team.team_name if team.score > opp_team.score else opp_team.team_name), center=True)
+            self.blogger.minorheading('PROJECTED SCORE: {0:.1f} - {1:.1f}'.format(team.projected_score(), opp_team.projected_score()), center=True)
+            self.blogger.minorheading('FINAL SCORE: {0} - {1}'.format(team.score, opp_team.score), center=True)
+            
             self.blogger.blank()
 
             # Star Players are picked by overall top score
             self.blogger.write('Star Players:', bold=True)
+            self.blogger.table_start(border=0)
             for player in match_players[:count]:
-                self.blogger.write(self.__get_player_summary(player, include_stats=True))
+                self.blogger.table_row(self.__get_player_summary_columns(player, include_stats=True))
+            
+            self.blogger.table_end()
             self.blogger.blank()
 
             # Underachievers are picked by performance vs expectation
             match_players.sort(key=lambda p: p.points - p.projected_points)
             self.blogger.write('Underachievers:', bold=True)
+            self.blogger.table_start(border=0)
             for player in match_players[:count]:
-                self.blogger.write(self.__get_player_summary(player, include_projected=True, include_stats=True))
+                self.blogger.table_row(self.__get_player_summary_columns(player, include_projected=True, include_stats=True))
+            
+            self.blogger.table_end()
             self.blogger.blank()
 
             self.blogger.blank()
@@ -65,34 +72,63 @@ class Brain(object):
         """Write the blog headings for the league-wide star players."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points, reverse=True)
 
-        self.blogger.heading('League All-Star Players', underline=True)
+        self.blogger.heading('League All-Star Players', underline=True, center=True)
+        self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.active_players[i]
-            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
+            self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
+
+        self.blogger.table_end()
+        self.blogger.blank()
+        self.blogger.blank()
         self.blogger.blank()
 
     def blog_bust_players(self, count=3):
         """Write the blog headings for the league-wide busts."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points)
 
-        self.blogger.heading('League Bust Players', underline=True)
+        self.blogger.heading('League Bust Players', underline=True, center=True)
+        self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.active_players[i]
-            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
+            self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
+
+        self.blogger.table_end()
+        self.blogger.blank()
+        self.blogger.blank()
         self.blogger.blank()
 
     def blog_bench_star_players(self, count=1):
         """Write the blog headings for the league-wide bench all-star."""
         self.bench_players.sort(key=lambda p: p.points, reverse=True)
 
-        self.blogger.heading('Best of the Bench', underline=True)
+        self.blogger.heading('Best of the Bench', underline=True, center=True)
+        self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.bench_players[i]
-            self.blogger.write(self.__get_player_summary(player, include_projected_verbose=True))
+            self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
+        
+        self.blogger.table_end()
+        self.blogger.blank()
+        self.blogger.blank()
         self.blogger.blank()
 
     def __get_player_summary(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
         """Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
+        :param include_projected: Includes a short (+/- X projected)
+        :param include_projected_verbose: Includes a longer (+/-X over/under projected)
+        :param include_stats: Includes a long string with interesting stats
+        """
+        summary_columns = self.__get_player_summary_columns(player, include_projected, include_projected_verbose, include_stats)
+        return '<b>{1}, {2} {3} {0}</b>: {4}'.format(
+                    summary_columns[0], # fantasy team owner
+                    summary_columns[1], # player name
+                    summary_columns[2], # player position
+                    summary_columns[3], # player team (real life)
+                    summary_columns[4]) # interesting stats
+
+    def __get_player_summary_columns(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
+        """Retrieve columns about a player's performance. Can be parameterized to focus on different areas.
         :param include_projected: Includes a short (+/- X projected)
         :param include_projected_verbose: Includes a longer (+/-X over/under projected)
         :param include_stats: Includes a long string with interesting stats
@@ -118,15 +154,19 @@ class Brain(object):
         if include_stats:
             stats = 'from {0}'.format(self.__get_interesting_stats(player))
 
-        return '<b>{0}, {1} {2} {3}</b>: {4:.1f} pts {5}{6}{7}'.format(
-                    player.name,
-                    player.team if player.team is not None else '',
-                    player.slot,
-                    self.teams[player.team_id].team_name_short,
-                    player.points,
-                    projected,
-                    projected_verbose,
-                    stats)
+        fantasy_team_col = '<b>{0}</b>'.format(self.teams[player.team_id].team_name_short)
+        player_name_col = player.name
+        player_pos_col = player.slot
+        player_team_col = player.team if player.team is not None else 'FA'
+        player_stats_col = '{0:.1f} pts {1}{2}{3}'.format(player.points, projected, projected_verbose, stats)
+
+        return (
+            fantasy_team_col,
+            player_name_col,
+            player_pos_col,
+            player_team_col,
+            player_stats_col
+        )
 
     def __get_interesting_stats(self, player):
         """Compose an interesting string about this player's stats.

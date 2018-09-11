@@ -7,17 +7,32 @@ class Blogger(object):
     def __init__(self):
         self.__lines = ['<!-- Written by ffautoblogger -->\n']
 
-    def heading(self, line, bold=False, italic=False, underline=False):
-        self.__lines.append('<h2>\n' + self.__accent(line, bold, italic, underline) + '\n</h2>\n')
+    def heading(self, line, center=False, bold=False, italic=False, underline=False):
+        attributes = ' style="text-align: center"' if center else ''
+        self.__lines.append('<h2{}>'.format(attributes) + self.__accent(line, bold, italic, underline) + '</h2>\n')
 
-    def subheading(self, line, bold=False, italic=False, underline=False):
-        self.__lines.append('<h3>\n' + self.__accent(line, bold, italic, underline) + '\n</h3>\n')
+    def subheading(self, line, center=False, bold=False, italic=False, underline=False):
+        attributes = ' style="text-align: center"' if center else ''
+        self.__lines.append('<h3{}>'.format(attributes) + self.__accent(line, bold, italic, underline) + '</h3>\n')
 
-    def minorheading(self, line, bold=False, italic=False, underline=False):
-        self.__lines.append('<h4>\n' + self.__accent(line, bold, italic, underline) + '\n</h4>\n')
+    def minorheading(self, line, center=False, bold=False, italic=False, underline=False):
+        attributes = ' style="text-align: center"' if center else ''
+        self.__lines.append('<h4{}>'.format(attributes) + self.__accent(line, bold, italic, underline) + '</h4>\n')
 
     def write(self, line, bold=False, italic=False, underline=False):
-        self.__lines.append('<div>\n' + self.__accent(line, bold, italic, underline) + '\n</div>\n')
+        self.__lines.append('<div>' + self.__accent(line, bold, italic, underline) + '</div>\n')
+
+    def table_start(self, border=1, center=False):
+        self.__lines.append('<table border={0} {1}>\n'.format(border, 'align="center"' if center else ''))
+
+    def table_end(self):
+        self.__lines.append('</table>\n')
+
+    def table_row(self, columns):
+        self.__lines.append('<tr>')
+        for column in columns:
+            self.__lines.append('<td>{0}</td>'.format(column))
+        self.__lines.append('</tr>\n')
 
     def blank(self):
         self.__lines.append('<br />\n')
