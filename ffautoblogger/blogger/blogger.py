@@ -1,9 +1,6 @@
-#
-# Writes simple HTML blog snippets
-#
-
 
 class Blogger(object):
+    """Writes simple HTML blog snippets with string formatting."""
     def __init__(self):
         self.__lines = ['<!-- Written by ffautoblogger -->\n']
 
@@ -19,8 +16,9 @@ class Blogger(object):
         attributes = ' style="text-align: center"' if center else ''
         self.__lines.append('<h4{}>'.format(attributes) + self.__accent(line, bold, italic, underline) + '</h4>\n')
 
-    def write(self, line, bold=False, italic=False, underline=False):
-        self.__lines.append('<div>' + self.__accent(line, bold, italic, underline) + '</div>\n')
+    def write(self, line, center=False, bold=False, italic=False, underline=False):
+        attributes = ' style="text-align: center"' if center else ''
+        self.__lines.append('<div{}>'.format(attributes) + self.__accent(line, bold, italic, underline) + '</div>\n')
 
     def table_start(self, border=1, center=False):
         self.__lines.append('<table border={0} {1}>\n'.format(border, 'align="center"' if center else ''))

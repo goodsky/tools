@@ -77,16 +77,20 @@ class ESPNScraper(object):
             name_row = team_row.find('div', class_='name')
             name_link = name_row.find('a')
             name_span = name_row.find('span')
+            record_span = team_row.find('span', class_='record')
             score_row = team_row.parent.find('td', class_='score')
 
             team_id = int(team_row.parent.attrs['id'].split('_')[1])
             team_name = name_link.string
-            team_name_short = name_span.string[1:-1] # remove the '(' ')'
+            team_name_short = name_span.string[1:-1]            # remove the '(' ')'
+            team_record = record_span.string[1:-1].split('-')   # remove the '(' ')' and split into wins-losses
             team_score = float(score_row.string)
 
             team = Team(team_id)
             team.team_name = team_name
             team.team_name_short = team_name_short
+            team.team_wins = int(team_record[0])
+            team.team_losses = int(team_record[1])
             team.score = team_score
 
             opp_name = team_row.parent.previous_sibling

@@ -72,7 +72,7 @@ class Brain(object):
         """Write the blog headings for the league-wide star players."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points, reverse=True)
 
-        self.blogger.heading('League All-Star Players', underline=True, center=True)
+        self.blogger.subheading('All-Star Players', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.active_players[i]
@@ -87,7 +87,7 @@ class Brain(object):
         """Write the blog headings for the league-wide busts."""
         self.active_players.sort(key=lambda p: p.points - p.projected_points)
 
-        self.blogger.heading('League Bust Players', underline=True, center=True)
+        self.blogger.subheading('Bust Players', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.active_players[i]
@@ -102,7 +102,7 @@ class Brain(object):
         """Write the blog headings for the league-wide bench all-star."""
         self.bench_players.sort(key=lambda p: p.points, reverse=True)
 
-        self.blogger.heading('Best of the Bench', underline=True, center=True)
+        self.blogger.subheading('Best of the Bench', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
             player = self.bench_players[i]
@@ -112,6 +112,35 @@ class Brain(object):
         self.blogger.blank()
         self.blogger.blank()
         self.blogger.blank()
+
+    def blog_coming_up_next(self, next_week_id, next_week_teams):
+        """Writes the matchups for next week."""
+        top_matchups = list(next_week_teams.values())
+        top_matchups.sort(key=lambda t: t.team_wins, reverse=True)
+
+        self.blogger.write("----- Coming up next -----", center=True)
+        self.blogger.blank()
+        self.blogger.write("Week {0}".format(next_week_id), center=True)
+        self.blogger.blank()
+        self.blogger.table_start(border=0, center=True)
+
+        seen_matchup = set()
+        for team in top_matchups:
+            if team.team_id in seen_matchup:
+                continue
+
+            opp_team = self.teams[team.opponent_id]
+            seen_matchup.add(team.team_id)
+            seen_matchup.add(opp_team.team_id)
+
+            team_string1 = '{0} ({1}-{2})'.format(team.team_name, team.team_wins, team.team_losses)
+            team_string2 = '{0} ({1}-{2})'.format(opp_team.team_name, opp_team.team_wins, opp_team.team_losses)
+
+            self.blogger.table_row((team_string1, ' vs. ', team_string2))
+
+        self.blogger.table_end()
+        self.blogger.blank()
+        
 
     def __get_player_summary(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
         """Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
