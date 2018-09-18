@@ -24,12 +24,13 @@ def main():
 
     # Create the blogging helper to write HTML
     blogger = Blogger()
-    blogger.blank()
-    blogger.blank()
-    blogger.blank()
+    blogger.blank(count=3)
 
     # Use a brain to write interesting blogs
-    brain = Brain(all_teams, blogger)
+    brain = Brain(week_id, all_teams, blogger)
+
+    brain.blog_current_standings()
+    blogger.blank(count=3)
 
     brain.blogger.horizontal_line()
     brain.blogger.heading("League Wide Winners and Losers", underline=True, center=True)

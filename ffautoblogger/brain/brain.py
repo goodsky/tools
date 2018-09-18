@@ -2,9 +2,12 @@
 class Brain(object):
     """My brain gets tired sometimes. Let's make a new one."""
 
-    def __init__(self, teams, blogger):
+    def __init__(self, week, teams, blogger):
+        self.week = int(week)
         self.teams = teams
         self.blogger = blogger
+
+        self.__fix_win_loss(teams)
 
         self.players = []
         for team in teams.values():
@@ -16,8 +19,7 @@ class Brain(object):
 
     def blog_match_summaries(self, count=3):
         """Write the blog headings for each match's summary. Indicate the final score as well as the Star Players and Underachievers."""
-        top_teams = list(self.teams.values())
-        top_teams.sort(key=lambda t: t.score, reverse=True)
+        top_teams = sorted(self.teams.values(), key=lambda t: t.score, reverse=True)
 
         seen_match = set()
         for team in top_teams:
@@ -62,61 +64,70 @@ class Brain(object):
                 self.blogger.table_row(self.__get_player_summary_columns(player, include_projected=True, include_stats=True))
             
             self.blogger.table_end()
-            self.blogger.blank()
-
-            self.blogger.blank()
-            self.blogger.blank()
-            self.blogger.blank()
+            self.blogger.blank(count=4)
 
     def blog_star_players(self, count=3):
         """Write the blog headings for the league-wide star players."""
-        self.active_players.sort(key=lambda p: p.points - p.projected_points, reverse=True)
+        top_active_players = sorted(self.active_players, key=lambda p: p.points - p.projected_points, reverse=True)
 
         self.blogger.subheading('All-Star Players', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
-            player = self.active_players[i]
+            player = top_active_players[i]
             self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
 
         self.blogger.table_end()
-        self.blogger.blank()
-        self.blogger.blank()
-        self.blogger.blank()
+        self.blogger.blank(count=3)
 
     def blog_bust_players(self, count=3):
         """Write the blog headings for the league-wide busts."""
-        self.active_players.sort(key=lambda p: p.points - p.projected_points)
+        bottom_active_players = sorted(self.active_players, key=lambda p: p.points - p.projected_points)
 
         self.blogger.subheading('Bust Players', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
-            player = self.active_players[i]
+            player = bottom_active_players[i]
             self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
 
         self.blogger.table_end()
-        self.blogger.blank()
-        self.blogger.blank()
-        self.blogger.blank()
+        self.blogger.blank(count=3)
 
     def blog_bench_star_players(self, count=1):
         """Write the blog headings for the league-wide bench all-star."""
-        self.bench_players.sort(key=lambda p: p.points, reverse=True)
+        top_bench_players = sorted(self.bench_players, key=lambda p: p.points, reverse=True)
 
         self.blogger.subheading('Best of the Bench', underline=True, center=True)
         self.blogger.table_start(border=0, center=True)
         for i in range(count):
-            player = self.bench_players[i]
+            player = top_bench_players[i]
             self.blogger.table_row(self.__get_player_summary_columns(player, include_projected_verbose=True))
         
         self.blogger.table_end()
+        self.blogger.blank(count=3)
+
+    def blog_current_standings(self):
+        """Write a table with the current standings.
+        Currently Sorted by:
+            A) Wins
+            B) Current week's score"""
+        team_standings = sorted(self.teams.values(), key=lambda t: (t.team_wins, t.score), reverse=True)
+
         self.blogger.blank()
+        self.blogger.write("---- Current Standings ----", center=True)
         self.blogger.blank()
-        self.blogger.blank()
+        self.blogger.table_start(border=0, center=True)
+
+        rank = 1
+        for team in team_standings:
+            self.blogger.table_row((rank, '{}-{}'.format(team.team_wins, team.team_losses), team.team_name_short, team.team_name, 'Coach {}'.format(team.coach_name)))
+            rank += 1
+
+        self.blogger.table_end()
 
     def blog_coming_up_next(self, next_week_id, next_week_teams):
         """Writes the matchups for next week."""
-        top_matchups = list(next_week_teams.values())
-        top_matchups.sort(key=lambda t: t.team_wins, reverse=True)
+        self.__fix_win_loss(next_week_teams)
+        top_matchups = sorted(next_week_teams.values(), key=lambda t: t.team_wins, reverse=True)
 
         self.blogger.write("----- Coming up next -----", center=True)
         self.blogger.blank()
@@ -129,7 +140,7 @@ class Brain(object):
             if team.team_id in seen_matchup:
                 continue
 
-            opp_team = self.teams[team.opponent_id]
+            opp_team = next_week_teams[team.opponent_id]
             seen_matchup.add(team.team_id)
             seen_matchup.add(opp_team.team_id)
 
@@ -141,6 +152,24 @@ class Brain(object):
         self.blogger.table_end()
         self.blogger.blank()
         
+    def __fix_win_loss(self, teams):
+        """Often when I run the blogger the win/loss values haven't yet accounted for the current week. 
+        Check for that, and update with the current data if that's the case."""
+        for team in teams.values():
+            # It's possible for the passed in team to have no score (if we are preparing the next week's matchups).
+            # Use the current week teams with scores for this comparison, but set the value back on the passed in teams.
+            team_this_week = self.teams[team.team_id]
+            opp_this_week = self.teams[team_this_week.opponent_id]
+
+            if (team.team_wins + team.team_losses < self.week):
+                if (team_this_week.score > opp_this_week.score):
+                    team.team_wins += 1
+                elif (team_this_week.score < opp_this_week.score):
+                    team.team_losses += 1
+                else:
+                    raise Exception("I don't handle ties right now... sounds like it's time for a new feature!")
+            
+
 
     def __get_player_summary(self, player, include_projected=False, include_projected_verbose=False, include_stats=False):
         """Write a single line to summarize a player's performance. Can be parameterized to focus on different areas.
