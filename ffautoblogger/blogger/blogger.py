@@ -32,8 +32,9 @@ class Blogger(object):
             self.__lines.append('<td>{0}</td>'.format(column))
         self.__lines.append('</tr>\n')
 
-    def blank(self):
-        self.__lines.append('<br />\n')
+    def blank(self, count=1):
+        for _ in range(max(0, count)):
+            self.__lines.append('<br />\n')
 
     def horizontal_line(self):
         self.__lines.append('<hr />\n')
