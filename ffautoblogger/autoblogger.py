@@ -17,8 +17,8 @@ def main():
     espn = ESPNScraper(league_id, season_id)
     
     if 'is_playoffs' in args:
-        clubhouse_id = args['clubhouse_id']
-        all_teams = espn.get_teams_playoffs(clubhouse_id, week_id)
+        matchup_id = args['matchup_id']
+        all_teams = espn.get_teams_playoffs(matchup_id, week_id)
     else:
         all_teams = espn.get_teams(week_id)
 

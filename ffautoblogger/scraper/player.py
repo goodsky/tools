@@ -146,6 +146,7 @@ class Player(object):
 
                 # if someone left an empty spot in their lineup
                 if len(name_parts) == 1:
+                    self.name = 'empty'
                     self.player_id = 'empty'
                     continue
 
