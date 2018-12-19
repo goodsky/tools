@@ -31,10 +31,10 @@ class ESPNScraper(object):
 
         return teams
     
-    def get_teams_playoffs(self, clubhouse_week, week):
+    def get_teams_playoffs(self, matchup_id, week):
         """Gets information from multiple sources and merges them into one data model."""
         week2 = str(int(week) + 1)
-        teams = self.get_teams_scoreboard(clubhouse_week)
+        teams = self.get_teams_scoreboard(matchup_id)
         
         for team in teams.values():
             players_boxscore1 = self.get_players_boxscore(team.team_id, week)
@@ -146,6 +146,8 @@ class ESPNScraper(object):
                     player_boxscore = Player(team_id)
                     player_boxscore.parse_boxscore_defense(row)
                     players[player_boxscore.player_id] = player_boxscore
+            else:
+                print("Unknown Table Type!!!")
 
         return players
 
