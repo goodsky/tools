@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SkylersTabata</string>
+    <string name="status_default">Press \"Start\" to begin</string>
+    <string name="status_paused_format">Workout paused during \"%s\"</string>
+    <string name="status_working_out_format">%s</string>
+    <string name="status_break_format">Next up: \"%s\"</string>
+    <string name="countdown_default">00:00</string>
+    <string name="overview_sets_format">Current Set: %d/%d</string>
+    <string name="overview_rounds_format">Current Round: %d/%d</string>
+    <string name="overview_loops_format">Current Loop: %d/%d</string>
+    <string name="overview_remaining_format">Remaining Time: %02d/%02d</string>
+    <string name="button_start">Start</string>
+    <string name="button_pause">Pause</string>
+    <string name="button_resume">Resume</string>
+    <string name="button_reset">Reset</string>
+</resources>
