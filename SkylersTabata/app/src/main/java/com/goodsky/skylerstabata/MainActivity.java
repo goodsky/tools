@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private int bell_fight_id;
     private int gong_id;
+    private int hit_id;
 
     // UI Elements
     private TextView statusTextView;
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         soundPool = new SoundPool.Builder().build();
         bell_fight_id = soundPool.load(context, R.raw.bell_fight, 1);
         gong_id = soundPool.load(context, R.raw.gong2_low, 1);
+        hit_id = soundPool.load(context, R.raw.hit, 1);
 
         // Initialize UI
         statusTextView = findViewById(R.id.textViewStatus);
@@ -267,6 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
         public void onTick(long msUntilFinished) {
             secondsLeftInState = (int)(msUntilFinished / ms);
+
+            // ticking sounds for 3.. 2.. 1..
+            if (secondsLeftInState > 0 && secondsLeftInState <= 3)
+            {
+                soundPool.play(hit_id, 1.0f, 1.0f, 1, 0, 1.0f);
+            }
+
             updateUi();
         }
 
