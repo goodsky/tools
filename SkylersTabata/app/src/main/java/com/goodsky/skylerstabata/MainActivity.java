@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Context context = getApplicationContext();
 
@@ -268,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onTick(long msUntilFinished) {
-            secondsLeftInState = (int)(msUntilFinished / ms);
+            secondsLeftInState = (int)(msUntilFinished / ms) + 1;
 
             // ticking sounds for 3.. 2.. 1..
             if (secondsLeftInState > 0 && secondsLeftInState <= 3)
