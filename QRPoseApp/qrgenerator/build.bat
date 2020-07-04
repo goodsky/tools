@@ -1,0 +1,1 @@
+javac QRCode.java -cp zxing/core-3.3.3.jar;zxing/javase-3.3.3.jar
