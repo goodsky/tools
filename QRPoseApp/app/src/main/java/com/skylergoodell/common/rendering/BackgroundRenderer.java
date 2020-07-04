@@ -125,7 +125,7 @@ public class BackgroundRenderer {
         }
 
         // Load render depth map shader.
-        {
+        /*{
             int vertexShader =
                     ShaderUtil.loadGLShader(
                             TAG, context, GLES20.GL_VERTEX_SHADER, DEPTH_VISUALIZER_VERTEX_SHADER_NAME);
@@ -144,7 +144,7 @@ public class BackgroundRenderer {
 
             depthTextureUniform = GLES20.glGetUniformLocation(depthProgram, "u_DepthTexture");
             ShaderUtil.checkGLError(TAG, "Program parameters");
-        }
+        }*/
 
         this.depthTextureId = depthTextureId;
     }

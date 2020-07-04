@@ -11,6 +11,8 @@ import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
+import com.google.ar.core.Plane;
+import com.google.ar.core.PointCloud;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
@@ -25,6 +27,8 @@ import com.skylergoodell.common.helpers.FullScreenHelper;
 import com.skylergoodell.common.helpers.SnackbarHelper;
 import com.skylergoodell.common.helpers.TrackingStateHelper;
 import com.skylergoodell.common.rendering.BackgroundRenderer;
+import com.skylergoodell.common.rendering.PlaneRenderer;
+import com.skylergoodell.common.rendering.PointCloudRenderer;
 
 import java.io.IOException;
 
@@ -41,8 +45,11 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
     private static final String TAG = QrPoseActivity.class.getSimpleName();
+    private static final String SEARCHING_PLANE_MESSAGE = "Searching for surfaces...";
 
     private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
+    private final PlaneRenderer planeRenderer = new PlaneRenderer();
+    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
     private final SnackbarHelper messageSnackbarHelper = new SnackbarHelper();
     private final TrackingStateHelper trackingStateHelper = new TrackingStateHelper(this);
 
@@ -213,6 +220,8 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
         // Prepare the rendering objects. This involves reading shaders, so may throw an IO Exception.
         try {
             backgroundRenderer.createOnGlThread(this, -1);
+            planeRenderer.createOnGlThread(this, "models/trigrid.png");
+            pointCloudRenderer.createOnGlThread(this);
         } catch (IOException e) {
             Log.e(TAG, "Failed to read an asset file", e);
         }
@@ -266,9 +275,49 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
                 messageSnackbarHelper.showMessage(this, TrackingStateHelper.getTrackingFailureReasonString(camera));
                 return;
             }
+
+            // No tracking error at this point. If we detected any plane, then hide the
+            // message UI, otherwise show searchingPlane message.
+            if (hasTrackingPlane()) {
+                messageSnackbarHelper.hide(this);
+            } else {
+                messageSnackbarHelper.showMessage(this, SEARCHING_PLANE_MESSAGE);
+            }
+
+            // Returns a projection matrix for rendering virtual content on top of the camera image.
+            // Note that the projection matrix reflects the current display geometry and display rotation.
+            // v: the near clip plane, in meters
+            // v1: the far clip plane, in meters
+            float[] projmtx = new float[16];
+            camera.getProjectionMatrix(projmtx, 0, 0.1f, 100.0f);
+
+            // Returns the view matrix for the camera for this frame. Note that the view matrix
+            // incorporates the display orientation.
+            // This is equivalent to: camera.getDisplayOrientedPose().inverse().asMatrix()
+            float[] viewmtx = new float[16];
+            camera.getViewMatrix(viewmtx, 0);
+
+            // Visualize tracked points.
+            // Use try-with-resources to automatically release the point cloud.
+            try (PointCloud pointCloud = frame.acquirePointCloud()) {
+                pointCloudRenderer.update(pointCloud);
+                pointCloudRenderer.draw(viewmtx, projmtx);
+            }
+
+            // Visualize planes.
+            planeRenderer.drawPlanes(session.getAllTrackables(Plane.class), camera.getDisplayOrientedPose(), projmtx);
         }
         catch (Throwable t) {
             Log.e(TAG, "Exception on the OpenGL thread", t);
         }
+    }
+
+    private boolean hasTrackingPlane() {
+        for (Plane plane : session.getAllTrackables(Plane.class)) {
+            if (plane.getTrackingState() == TrackingState.TRACKING) {
+                return true;
+            }
+        }
+        return false;
     }
 }
