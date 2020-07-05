@@ -38,22 +38,25 @@ public class QRCode {
         // Encoding charset 
         String charset = "UTF-8"; 
   
-        Map<EncodeHintType, 
-            ErrorCorrectionLevel> 
-            hashMap 
-            = new HashMap<EncodeHintType, 
-                          ErrorCorrectionLevel>(); 
+        Map<EncodeHintType, Object> 
+            hints 
+            = new HashMap<EncodeHintType, Object>(); 
   
-        hashMap.put( 
+        hints.put( 
             EncodeHintType.ERROR_CORRECTION, 
             ErrorCorrectionLevel.L); 
   
+        hints.put(
+            EncodeHintType.MARGIN,
+            0);
+
         // Create the QR code and save 
         // in the specified folder 
         // as a jpg file 
+        // 386 x 386px ~= 10cm image
         createQRCode(data, path, 
-                     charset, hashMap, 
-                     200, 200);
+                     charset, hints, 
+                     386, 386);
 
         System.out.println( 
             "QR Code Generated!!! "); 
@@ -62,7 +65,7 @@ public class QRCode {
     // Function to create the QR code 
     public static void createQRCode( 
         String data, String path, 
-        String charset, Map hashMap, 
+        String charset, Map hints, 
         int height, int width) 
         throws WriterException, IOException 
     { 
@@ -71,7 +74,10 @@ public class QRCode {
                 new String( 
                     data.getBytes(charset), 
                     charset), 
-                BarcodeFormat.QR_CODE, width, height); 
+                BarcodeFormat.QR_CODE,
+                width,
+                height,
+                hints); 
   
         MatrixToImageWriter 
             .writeToFile( 
