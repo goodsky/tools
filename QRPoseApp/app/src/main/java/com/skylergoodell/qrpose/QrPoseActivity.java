@@ -258,7 +258,7 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
             planeRenderer.createOnGlThread(this, "models/trigrid.png");
             pointCloudRenderer.createOnGlThread(this);
 
-            objectRenderer.createOnGlThread(this, "models/andy.obj", "models/andy.png");
+            objectRenderer.createOnGlThread(this, "models/pin.obj", "models/pin.png");
             objectRenderer.setBlendMode(ObjectRenderer.BlendMode.AlphaBlending);
             objectRenderer.setMaterialProperties(0.0f, 2.0f, 0.5f, 6.0f);
 
