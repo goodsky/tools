@@ -125,7 +125,72 @@ public class QRCodeHelper {
      * @return The pose from the QR code to the camera, or null if one could not be estimated
      */
     public static Pose TryEstimateQRCodeToCameraPose(DetectedQRCode qrCode, float[] rowMajorCameraIntrinsics) {
+        if (!qrCode.arePointsValid(true)) {
+            return null;
+        }
+
+        Mat mat = new Mat(4, 3, MatType.CV_32F);
+
         return null;
+    }
+
+    private static Vector3D Get3DPointInQRCode(QRCodePointPosition position, QRCodeMetadata metadata)
+            throws Exception
+    {
+        // A QR code is made of small black and white squares, which are called modules.
+        // 'Finder patterns' are the three bigger square structure located in the bottom left, top left and top right.
+        // 'Alignment patterns' are special square structures located in all but Version 1 QR Codes.
+        // More information about how patterns are placed in QR codes is here -
+        // https://www.thonky.com/qr-code-tutorial/module-placement-matrix
+
+        // The center of a Finder pattern is 3.5 modules away from the respective corner in each direction.
+        float finderPatternShiftFromCornerInModules = 3.5f;
+
+        // The center of bottom right Alignment pattern is 6.5 modules away from the bottom right corner  in each direction.
+        float alignmentPatternShiftFromBottomRightCornerInModules = 6.5f;
+
+        float moduleSizeMeters = metadata.moduleSizeMeters();
+        int numModules = metadata.numModules();
+
+        if (moduleSizeMeters <= 1e-6 || numModules <= 0)
+        {
+            throw new Exception("Invalid qr code metadata.");
+        }
+
+        Vector3D point = new Vector3D();
+        switch (position)
+        {
+            case BottomLeftFinderPatternCenter:
+                point.x = finderPatternShiftFromCornerInModules * moduleSizeMeters;
+                point.y = (numModules - finderPatternShiftFromCornerInModules) * moduleSizeMeters;
+                point.z = 0;
+                break;
+            case TopLeftFinderPatternCenter:
+                point.x = finderPatternShiftFromCornerInModules * moduleSizeMeters;
+                point.y = finderPatternShiftFromCornerInModules * moduleSizeMeters;
+                point.z = 0;
+                break;
+            case TopRightFinderPatternCenter:
+                point.x = (numModules - finderPatternShiftFromCornerInModules) * moduleSizeMeters;
+                point.y = finderPatternShiftFromCornerInModules * moduleSizeMeters;
+                point.z = 0;
+                break;
+            case BottomRightAlignmentPatternCenter:
+                point.x = (numModules - alignmentPatternShiftFromBottomRightCornerInModules) * moduleSizeMeters;
+                point.y = (numModules - alignmentPatternShiftFromBottomRightCornerInModules) * moduleSizeMeters;
+                point.z = 0.0f;
+                break;
+            default:
+                throw new Exception("Unknown 2D point position");
+        }
+
+        return point;
+    }
+
+    private static class Vector3D {
+        public float x;
+        public float y;
+        public float z;
     }
 }
 
