@@ -30,10 +30,10 @@ public class QRCode {
     { 
   
         // The data that the QR code will contain 
-        String data = "www.geeksforgeeks.org"; 
+        String data = "www.skylergoodell.com/hello/skyler"; 
   
         // The path where the image will get saved 
-        String path = "D:\\Data\\QRCodes\\sample.jpg"; 
+        String path = "D:\\Data\\QRCodes\\helloskyler.jpg"; 
 
         // Encoding charset 
         String charset = "UTF-8"; 
