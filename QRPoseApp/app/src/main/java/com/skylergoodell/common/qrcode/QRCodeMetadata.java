@@ -11,6 +11,12 @@ public class QRCodeMetadata {
         SizeMeters = -1f;
     }
 
+    public QRCodeMetadata(String data, int version, float sizeInMeters) {
+        Data = data;
+        Version = version;
+        SizeMeters = sizeInMeters;
+    }
+
     public int numModules() {
         if (Version <= 0) {
             return 0;

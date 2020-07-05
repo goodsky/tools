@@ -7,22 +7,14 @@ public class DetectedQRCode {
     public ArrayList<QRPoint2D> Points;
     public QRCodeMetadata Metadata;
 
-    public DetectedQRCode(ArrayList<QRPoint2D> points)
-    {
+    public DetectedQRCode(ArrayList<QRPoint2D> points) {
         Points = points;
         Metadata = new QRCodeMetadata();
     }
 
-    public void setData(String data) {
-        Metadata.Data = data;
-    }
-
-    public void setVersion(int version) {
-        Metadata.Version = version;
-    }
-
-    public void setSizeInMeters(float sizeInMeters) {
-        Metadata.SizeMeters = sizeInMeters;
+    public DetectedQRCode(ArrayList<QRPoint2D> points, QRCodeMetadata metadata) {
+        Points = points;
+        Metadata = metadata;
     }
 
     public boolean arePointsValid(boolean forPoseComputation)
