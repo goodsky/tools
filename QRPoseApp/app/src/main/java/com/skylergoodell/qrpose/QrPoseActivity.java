@@ -35,6 +35,8 @@ import com.skylergoodell.common.helpers.FullScreenHelper;
 import com.skylergoodell.common.helpers.SnackbarHelper;
 import com.skylergoodell.common.helpers.TapHelper;
 import com.skylergoodell.common.helpers.TrackingStateHelper;
+import com.skylergoodell.common.qrcode.DetectedQRCode;
+import com.skylergoodell.common.qrcode.QRCodeHelper;
 import com.skylergoodell.common.rendering.BackgroundRenderer;
 import com.skylergoodell.common.rendering.ObjectRenderer;
 import com.skylergoodell.common.rendering.PlaneRenderer;
@@ -149,6 +151,7 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
 
                 session = new Session(this);
                 Config config = session.getConfig();
+                config.setFocusMode(Config.FocusMode.AUTO);
                 config.setDepthMode(Config.DepthMode.DISABLED);
                 session.configure(config);
             } catch (UnavailableDeviceNotCompatibleException e) {
@@ -371,6 +374,12 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
                 // Update and draw the model
                 objectRenderer.updateModelMatrix(anchorMatrix, scaleFactor);
                 objectRenderer.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
+            }
+
+            // Check for a QR Code
+            DetectedQRCode code = QRCodeHelper.DetectQRCodes(frame);
+            if (code != null) {
+                Log.i(TAG, "Estimating pose from QR Code to Camera...");
             }
         }
         catch (Throwable t) {
