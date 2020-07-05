@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
+import com.google.ar.core.CameraIntrinsics;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
@@ -37,10 +38,16 @@ import com.skylergoodell.common.helpers.TapHelper;
 import com.skylergoodell.common.helpers.TrackingStateHelper;
 import com.skylergoodell.common.qrcode.DetectedQRCode;
 import com.skylergoodell.common.qrcode.QRCodeHelper;
+import com.skylergoodell.common.qrcode.QRCodeMetadata;
 import com.skylergoodell.common.rendering.BackgroundRenderer;
 import com.skylergoodell.common.rendering.ObjectRenderer;
 import com.skylergoodell.common.rendering.PlaneRenderer;
 import com.skylergoodell.common.rendering.PointCloudRenderer;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +73,7 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
     private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
     private final SnackbarHelper messageSnackbarHelper = new SnackbarHelper();
     private final TrackingStateHelper trackingStateHelper = new TrackingStateHelper(this);
+    private final QRCodeHelper qrCodeHelper = new QRCodeHelper();
 
     private DisplayRotationHelper displayRotationHelper;
     private GLSurfaceView surfaceView;
@@ -129,6 +137,12 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.e("OpenCV", "Internal OpenCV library not found.");
+        } else {
+            Log.i("OpenCV", "OpenCV library found inside package. Using it!");
+        }
 
         if (session == null) {
             Exception exception = null;
@@ -377,9 +391,13 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
             }
 
             // Check for a QR Code
-            DetectedQRCode code = QRCodeHelper.DetectQRCodes(frame);
+            DetectedQRCode code = qrCodeHelper.detectQRCodes(frame);
             if (code != null) {
-                Log.i(TAG, "Estimating pose from QR Code to Camera...");
+                float[] rowMajorCameraIntrinsics = getCameraIntrinsics(camera);
+                Pose qrCodeToCameraPose = qrCodeHelper.tryEstimateQRCodeToCameraPose(code, rowMajorCameraIntrinsics);
+                if (qrCodeToCameraPose != null) {
+                    Log.i(TAG, String.format("I GOT A POSE!!! %s", qrCodeToCameraPose.toString()));
+                }
             }
         }
         catch (Throwable t) {
@@ -437,5 +455,20 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
             }
         }
         return false;
+    }
+
+    private float[] getCameraIntrinsics(Camera camera) {
+        CameraIntrinsics intrinsics = camera.getImageIntrinsics();
+        float fx = intrinsics.getFocalLength()[0];
+        float fy = intrinsics.getFocalLength()[1];
+        float cx = intrinsics.getPrincipalPoint()[0];
+        float cy = intrinsics.getPrincipalPoint()[1];
+        float s = 0f;
+
+        return new float[] {
+                fx, s, cx,
+                0f, fy, cy,
+                0f, 0f, 1f,
+        };
     }
 }

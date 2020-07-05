@@ -10,6 +10,13 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++14 -fexceptions -frtti"
+                arguments "-DANDROID_ARM_NEON=TRUE",'-DANDROID_STL=c++_shared'
+            }
+        }
     }
 
     buildTypes {
@@ -38,4 +45,7 @@ dependencies {
 
     // Zebra Crossing (QR Codes)
     implementation 'com.google.zxing:core:3.3.0'
+
+    // Open CV
+    implementation project(path: ':opencv')
 }

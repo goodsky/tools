@@ -50,6 +50,11 @@ public class QRCode {
             EncodeHintType.MARGIN,
             0);
 
+        hints.put(
+            EncodeHintType.QR_VERSION,
+            3
+        );
+
         // Create the QR code and save 
         // in the specified folder 
         // as a jpg file 
