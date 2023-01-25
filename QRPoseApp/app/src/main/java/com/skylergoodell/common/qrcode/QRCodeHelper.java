@@ -165,6 +165,14 @@ public class QRCodeHelper {
             points3DInMarker[pointCount] = point3DInMarker;
             points2DInCamera[pointCount] = point2DInCamera;
 
+            /*Log.d(TAG, String.format("[Try Estimate QR Code To Camera] position: %s; point2DInCamera: (%f, %f); point3DInMarker: (%f, %f, %f)",
+                    point.Position,
+                    point2DInCamera.x,
+                    point2DInCamera.y,
+                    point3DInMarker.x,
+                    point3DInMarker.y,
+                    point3DInMarker.z));*/
+
             pointCount++;
         }
 
@@ -173,7 +181,7 @@ public class QRCodeHelper {
 
         Mat cameraMatrix = new Mat(3, 3, CV_32F);
         for (int i = 0; i < 9; ++i) {
-            cameraMatrix.put(i / 3, i %3, rowMajorCameraIntrinsics[i]);
+            cameraMatrix.put(i / 3, i % 3, rowMajorCameraIntrinsics[i]);
         }
 
         MatOfDouble distortionCoefficientsMat = new MatOfDouble();
@@ -199,6 +207,8 @@ public class QRCodeHelper {
                     solvePnpFlag);
 
             Pose qrCodeToCameraPose = convertOpenCVPnPResultToPose(rodriguesRotationQrCodeToCamera, translationQRCodeToCamera);
+            // Log.d(TAG, String.format("[Calculated Pose] pose: %s", qrCodeToCameraPose.toString()));
+
             double squaredResidualPixels = isValidQRCodeToCameraPose(
                         points3DInMarker,
                         points2DInCamera,
@@ -217,7 +227,7 @@ public class QRCodeHelper {
 
         if (minSquaredResidualPixels == Double.MAX_VALUE)
         {
-            Log.i(TAG, "Found no valid QR Code to Camera Poses.");
+            // Log.i(TAG, "Found no valid QR Code to Camera Poses.");
             return null;
         }
 
@@ -339,13 +349,12 @@ public class QRCodeHelper {
                 (float)translationMagnitude,
                 rowMajorCameraIntrinsics[0]);
 
-
         double squaredResidualPixels = computeResidual(points3DInMarker, points2DInCamera, qrCodeToCameraPose, rowMajorCameraIntrinsics);
         double maxAcceptableSquaredResidualPixels = points3DInMarker.length * maxAllowedSquaredResidualPixelsPerPoint;
         if (squaredResidualPixels > maxAcceptableSquaredResidualPixels)
         {
-            Log.i(TAG, String.format("Residual pixels is larger than max allowed. Squared Residual: %f; Max Allowed: %f;", squaredResidualPixels, maxAcceptableSquaredResidualPixels));
-            return Double.MAX_VALUE;
+            // Log.d(TAG, String.format("Residual pixels is larger than max allowed. Squared Residual: %f; Max Allowed: %f;", squaredResidualPixels, maxAcceptableSquaredResidualPixels));
+            // return Double.MAX_VALUE;
         }
 
         return squaredResidualPixels;
@@ -387,11 +396,20 @@ public class QRCodeHelper {
             squaredResidualPixels += Math.pow(points2DInCamera[i].x - projectedMarkerPointInCameraPixels.x, 2);
             squaredResidualPixels += Math.pow(points2DInCamera[i].y - projectedMarkerPointInCameraPixels.y, 2);
 
-            Log.i(TAG, String.format("[Calculating Residual] point2DInCamera: (%f, %f); projectedMarkerPointInCamera: (%f, %f);",
+            /*Log.d(TAG, String.format("[ProjectedMarkerPoint] markerPoint: (%f, %f, %f); projectedMarkerPointInCamera: (%f, %f);",
+                    markerPoint.x,
+                    markerPoint.y,
+                    markerPoint.z,
+                    projectedMarkerPointInCamera.x,
+                    projectedMarkerPointInCamera.y));*/
+
+            Log.d(TAG, String.format("[Calculating Residual] point2DInCamera: (%f, %f); projectedMarkerPointInCamera: (%f, %f); delta: (%f, %f)",
                     points2DInCamera[i].x,
                     points2DInCamera[i].y,
                     projectedMarkerPointInCameraPixels.x,
-                    projectedMarkerPointInCameraPixels.y));
+                    projectedMarkerPointInCameraPixels.y,
+                    Math.pow(points2DInCamera[i].x - projectedMarkerPointInCameraPixels.x, 2),
+                    Math.pow(points2DInCamera[i].y - projectedMarkerPointInCameraPixels.y, 2)));
         }
 
         return squaredResidualPixels;

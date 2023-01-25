@@ -1,6 +1,5 @@
 package com.skylergoodell.qrpose;
 
-import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -38,16 +37,12 @@ import com.skylergoodell.common.helpers.TapHelper;
 import com.skylergoodell.common.helpers.TrackingStateHelper;
 import com.skylergoodell.common.qrcode.DetectedQRCode;
 import com.skylergoodell.common.qrcode.QRCodeHelper;
-import com.skylergoodell.common.qrcode.QRCodeMetadata;
 import com.skylergoodell.common.rendering.BackgroundRenderer;
 import com.skylergoodell.common.rendering.ObjectRenderer;
 import com.skylergoodell.common.rendering.PlaneRenderer;
 import com.skylergoodell.common.rendering.PointCloudRenderer;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.Mat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -98,7 +93,10 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
     private static final float[] DEFAULT_COLOR = new float[] {0f, 0f, 0f, 0f};
     private static final float[] BLUE_COLOR = new float[] {66.0f, 133.0f, 244.0f, 255.0f};
     private static final float[] GREEN_COLOR = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
+    private static final float[] RED_COLOR = { 255.f, 127.f, 127.f, 255.f };
     private final ArrayList<ColoredAnchor> anchors = new ArrayList<ColoredAnchor>();
+
+    private Pose qrCodeToWorldPose = Pose.IDENTITY;
 
     /**
      * Called when the activity is first created. This is where you should do all of your normal
@@ -394,11 +392,31 @@ public class QrPoseActivity extends AppCompatActivity implements GLSurfaceView.R
             DetectedQRCode code = qrCodeHelper.detectQRCodes(frame);
             if (code != null) {
                 float[] rowMajorCameraIntrinsics = getCameraIntrinsics(camera);
+
                 Pose qrCodeToCameraPose = qrCodeHelper.tryEstimateQRCodeToCameraPose(code, rowMajorCameraIntrinsics);
                 if (qrCodeToCameraPose != null) {
                     Log.i(TAG, String.format("I GOT A POSE!!! %s", qrCodeToCameraPose.toString()));
+
+                    Pose cameraToWorldPose = camera.getPose();
+                    qrCodeToWorldPose = cameraToWorldPose.compose(qrCodeToCameraPose);
                 }
             }
+
+            /*Pose cameraTo1meterInFrontOfCamera = Pose.makeTranslation(0f, 0f, 1f);
+            Pose cameraToWorldPose = camera.getDisplayOrientedPose();
+            Pose worldToCameraPose = cameraToWorldPose.inverse();
+
+            Pose worldTo1meterInFrontOfCamera = cameraTo1meterInFrontOfCamera.compose(worldToCameraPose);
+
+            qrCodeToWorldPose = worldTo1meterInFrontOfCamera;*/
+
+            // Visualize QR Anchor
+            float[] qrCodeToWorldPoseMatrix = new float[16];
+            qrCodeToWorldPose.toMatrix(qrCodeToWorldPoseMatrix, 0);
+
+            // Update and draw the model
+            objectRenderer.updateModelMatrix(qrCodeToWorldPoseMatrix, scaleFactor);
+            objectRenderer.draw(viewmtx, projmtx, colorCorrectionRgba, RED_COLOR);
         }
         catch (Throwable t) {
             Log.e(TAG, "Exception on the OpenGL thread", t);
