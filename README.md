@@ -15,3 +15,4 @@ Repository for various unpolished or incomplete tools before warrenting its own 
 | clr-safari           | 01/28/2017 | Set of experiments to help understand the .NET CLR and CoreFx.                            |
 | ffautoblogger        | 09/11/2017 | Fantasy Football auto blogger- writes html summary of the week using ESPN.                |
 | lispc                | 12/29/2017 | Simple Lisp intepreter written in C++.                                                    |
+| balatro-stat         | 04/07/2024 | Poker hand statistics for the game Balatro                                                |
