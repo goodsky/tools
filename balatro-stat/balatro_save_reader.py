@@ -53,16 +53,13 @@ class BalatroCard(object):
         self.index = index
         self.suit = card_entry['base']['suit']
         self.value = card_entry['base']['value']
-        self.chips = value_to_chips[self.value]
-        self.mult = 0
+        self.chips = value_to_chips[self.value] + card_entry['ability']['bonus']
+        self.mult = card_entry['ability']['mult']
         self.ordinal = value_to_ordinal[self.value]
 
-    def __init__(self, value, suit):
-        self.suit = suit
-        self.value = value
-        self.chips = value_to_chips[self.value] 
-        self.mult = 0
-        self.ordinal = value_to_ordinal[self.value]
+        # True if the card isn't used to determine poker hands (like a Stone card)
+        label = card_entry.get('label')
+        self.exclude_in_poker_hand = label in [ 'Stone Card' ]
     
     def __str__(self):
         suit_str = suit_to_char[self.suit] if self.suit in suit_to_char else self.suit

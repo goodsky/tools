@@ -1,4 +1,16 @@
-from balatro_save_reader import BalatroCard, BalatroPokerHand
+from balatro_save_reader import BalatroCard
+
+class PokerHandName:
+    STRAIGHT_FLUSH = 'Straight Flush'
+    FOUR_OF_A_KIND = 'Four of a Kind'
+    FULL_HOUSE = 'Full House'
+    FLUSH = 'Flush'
+    STRAIGHT = 'Straight'
+    THREE_OF_A_KIND = 'Three of a Kind'
+    TWO_PAIR = 'Two Pair'
+    PAIR = 'Pair'
+    HIGH_CARD = 'High Card'
+
 
 def has_straight(hand: list[BalatroCard], require_flush: bool = False) -> bool:
     # nb: requires hand to be sorted by ordinal descending
@@ -37,28 +49,30 @@ def has_full_house(value_counts: dict[str, int]) -> bool:
     threes = len([count for count in value_counts.values() if count >= 3])
     return threes >= 1 and pairs >= 2 # one of the pairs is the three of a kind 
 
-def find_poker_hands(hand: list[BalatroCard]):
+def find_poker_hands(hand: list[BalatroCard]) -> dict[str, bool]:
+    hand = [card for card in hand if not card.exclude_in_poker_hand]
+
     value_counts = {}
+    suit_counts = {}
     for card in hand:
         if card.value not in value_counts:
             value_counts[card.value] = 0
         value_counts[card.value] += 1
 
-    suit_counts = {}
-    for card in hand:
         if card.suit not in suit_counts:
             suit_counts[card.suit] = 0
-        suit_counts[card.suit] += 1
+        suit_counts[card.suit] += 1   
 
     hand.sort(reverse=True, key=lambda c: c.ordinal)
     return {
-        'straight_flush': has_straight(hand, require_flush=True),
-        'four_of_a_kind': has_of_a_kind(value_counts, set_size=4),
-        'full_house': has_full_house(value_counts),
-        'flush': has_flush(suit_counts),
-        'straight': has_straight(hand),
-        'two_pair': has_pairs(value_counts, pair_count=2),
-        'three_of_a_kind': has_of_a_kind(value_counts, set_size=3),
-        'pair': has_pairs(value_counts, pair_count=1),
+        PokerHandName.STRAIGHT_FLUSH: has_straight(hand, require_flush=True),
+        PokerHandName.FOUR_OF_A_KIND: has_of_a_kind(value_counts, set_size=4),
+        PokerHandName.FULL_HOUSE: has_full_house(value_counts),
+        PokerHandName.FLUSH: has_flush(suit_counts),
+        PokerHandName.STRAIGHT: has_straight(hand),
+        PokerHandName.THREE_OF_A_KIND: has_of_a_kind(value_counts, set_size=3),
+        PokerHandName.TWO_PAIR: has_pairs(value_counts, pair_count=2),
+        PokerHandName.PAIR: has_pairs(value_counts, pair_count=1),
+        PokerHandName.HIGH_CARD: True,
     }
 
