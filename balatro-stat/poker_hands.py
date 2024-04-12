@@ -11,6 +11,7 @@ class PokerHandName:
     PAIR = 'Pair'
     HIGH_CARD = 'High Card'
 
+poker_hand_names = [value for key, value in vars(PokerHandName).items() if not key.startswith('__')]
 
 def has_straight(hand: list[BalatroCard], require_flush: bool = False) -> bool:
     # nb: requires hand to be sorted by ordinal descending
