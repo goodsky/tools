@@ -15,4 +15,6 @@ Repository for various unpolished or incomplete tools before warrenting its own 
 | clr-safari           | 01/28/2017 | Set of experiments to help understand the .NET CLR and CoreFx.                            |
 | ffautoblogger        | 09/11/2017 | Fantasy Football auto blogger- writes html summary of the week using ESPN.                |
 | lispc                | 12/29/2017 | Simple Lisp intepreter written in C++.                                                    |
+| babynames            | 01/24/2023 | Analysis of baby names using the SSA names dataset                                        |
 | balatro-stat         | 04/07/2024 | Poker hand statistics for the game Balatro                                                |
+| yoto-podcast         | 12/17/2024 | Scripts to download podcasts & media for yoto player                                      |
