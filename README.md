@@ -18,3 +18,4 @@ Repository for various unpolished or incomplete tools before warrenting its own 
 | babynames            | 01/24/2023 | Analysis of baby names using the SSA names dataset                                        |
 | balatro-stat         | 04/07/2024 | Poker hand statistics for the game Balatro                                                |
 | yoto-podcast         | 12/17/2024 | Scripts to download podcasts & media for yoto player                                      |
+| diffusers            | 07/20/2025 | Stable Diffusion scripts for generating video game assets                                 |
