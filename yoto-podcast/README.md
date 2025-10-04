@@ -11,3 +11,7 @@ Script to download podcast episodes to disk. Then you can upload them as a Yoto 
 ## Thomas & Friends Storytime
 
 > python fetch_podcast.py https://feeds.megaphone.fm/thomasandfriendsstorytime -o downloads/thomas -t full
+
+## Circle Round Kids!
+
+> python fetch_podcast.py https://rss.wbur.org/circleround/podcast -o downloads/circle
